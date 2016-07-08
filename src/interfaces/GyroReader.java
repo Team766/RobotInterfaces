@@ -40,9 +40,4 @@ public interface GyroReader {
 	   * @return the current rate in degrees per second
 	   */
 	  public double getRate();
-
-	  /**
-	   * Free the resources used by the gyro
-	   */
-	  public void free();
 }
