@@ -55,7 +55,4 @@ public interface SpeedController {
    * to re-enable the motor.
    */
   void stopMotor();
-  
-  //From PIDOut interface
-  public void pidWrite(double output);
 }
