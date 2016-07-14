@@ -6,18 +6,14 @@ public abstract class RobotProvider {
 	
 	
 	//HAL
-	public abstract SpeedController getLeftDrive();
-	public abstract SpeedController getRightDrive();
+	public abstract SpeedController getMotor(int index);
 	
-	public abstract EncoderReader getLeftEncoder();
-	public abstract EncoderReader getRightEncoder();
+	public abstract EncoderReader getEncoder(int index);
 	
-	public abstract SolenoidController getDriveShifter();
+	public abstract SolenoidController getSolenoid(int index);
 	
-	public abstract GyroReader getGyro();
+	public abstract GyroReader getGyro(int index);
 	
 	//Operator Devices
-	public abstract JoystickReader getLeftJoystick();
-	public abstract JoystickReader getRightJoystick();
-	public abstract JoystickReader getBoxJoystick();
+	public abstract JoystickReader getJoystick(int index);
 }
