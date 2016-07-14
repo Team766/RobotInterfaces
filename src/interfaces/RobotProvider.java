@@ -4,6 +4,8 @@ public abstract class RobotProvider {
 	
 	public static RobotProvider instance;
 	
+	
+	//HAL
 	public abstract SpeedController getLeftDrive();
 	public abstract SpeedController getRightDrive();
 	
@@ -13,4 +15,9 @@ public abstract class RobotProvider {
 	public abstract SolenoidController getDriveShifter();
 	
 	public abstract GyroReader getGyro();
+	
+	//Operator Devices
+	public abstract JoystickReader getLeftJoystick();
+	public abstract JoystickReader getRightJoystick();
+	public abstract JoystickReader getBoxJoystick();
 }
