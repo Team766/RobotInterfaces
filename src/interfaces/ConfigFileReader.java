@@ -20,10 +20,10 @@ public class ConfigFileReader {
 	
 	private static ConfigFileReader instance;
 	
-	private String fileName = "";
+	public static String fileName = "";
 	
 	private BufferedReader reader;
-	private HashMap<String, Integer> devices;
+	private HashMap<String, int[]> devices;
 	
 	public static ConfigFileReader getInstance(){
 		if(instance == null)
@@ -33,7 +33,7 @@ public class ConfigFileReader {
 	
 	public ConfigFileReader(){
 		System.out.println("Loading config file: " + fileName);
-		devices = new HashMap<String, Integer>();
+		devices = new HashMap<String, int[]>();
 		String currLine = "";
 		try {
 			reader = new BufferedReader(new FileReader(fileName));
@@ -41,7 +41,7 @@ public class ConfigFileReader {
 			currLine = reader.readLine();
 			while(currLine != null){
 				//Separate the key from the value
-				devices.put(currLine.substring(0, currLine.indexOf(",")), Integer.parseInt(currLine.substring(currLine.indexOf(",") + 1)));
+				devices.put(currLine.substring(0, currLine.indexOf(",")), stringToInt(currLine.substring(currLine.indexOf(",") + 1).split(",")));
 				currLine = reader.readLine();
 			}
 			
@@ -52,11 +52,21 @@ public class ConfigFileReader {
 		}
 	}
 	
-	public int getPort(String key){
+	private int[] stringToInt(String[] in){
+		int[] out = new int[in.length];
+		
+		for(int i = 0; i < in.length; i++){
+			out[i] = Integer.parseInt(in[i]);
+		}
+		return out;
+	}
+	
+	public int[] getPorts(String key){
 		return devices.get(key);
 	}
 	
-	public void setFileName(String name){
-		fileName = name;
+	public int getPort(String key){
+		return getPorts(key)[0];
 	}
+	
 }

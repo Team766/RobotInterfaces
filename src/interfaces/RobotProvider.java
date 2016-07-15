@@ -8,7 +8,7 @@ public abstract class RobotProvider {
 	//HAL
 	public abstract SpeedController getMotor(int index);
 	
-	public abstract EncoderReader getEncoder(int index);
+	public abstract EncoderReader getEncoder(int index1, int index2);
 	
 	public abstract SolenoidController getSolenoid(int index);
 	
