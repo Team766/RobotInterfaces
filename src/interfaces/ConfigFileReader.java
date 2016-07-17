@@ -36,7 +36,7 @@ public class ConfigFileReader {
 		devices = new HashMap<String, int[]>();
 		String currLine = "";
 		try {
-			reader = new BufferedReader(new FileReader(fileName));
+			reader = new BufferedReader(new FileReader(this.getClass().getClassLoader().getResource(fileName).getPath()));
 			
 			currLine = reader.readLine();
 			while(currLine != null){
