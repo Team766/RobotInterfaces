@@ -4,6 +4,11 @@ public abstract class RobotProvider {
 	
 	public static RobotProvider instance;
 	
+	protected SpeedController[] motors = new SpeedController[10];
+	protected EncoderReader[] encoders = new EncoderReader[10];
+	protected SolenoidController[] solenoids = new SolenoidController[10];
+	protected GyroReader[] gyros = new GyroReader[5];
+	protected JoystickReader[] joysticks = new JoystickReader[3];
 	
 	//HAL
 	public abstract SpeedController getMotor(int index);

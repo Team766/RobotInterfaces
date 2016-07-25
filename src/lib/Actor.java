@@ -7,6 +7,8 @@ public abstract class Actor implements Runnable{
 	public Class<? extends Message>[] acceptableMessages = (Class<? extends Message>[])new Class[]{};
 	private LinkedBlockingQueue<Message> inbox = new LinkedBlockingQueue<Message>();
 	
+	public Class<? extends Actor>[] actorHierarchy = (Class<? extends Actor>[])new Class[]{};
+	
 	public boolean enabled = true;
 	
 	public abstract void init();
