@@ -11,6 +11,8 @@ import java.util.HashMap;
  * 
  * leftDrive,1
  * rightDrive,100
+ * axisCamera,10.7.66.11
+ * usbCamera,cam0
  * 
  * @author Brett Levenson
  *
@@ -24,6 +26,7 @@ public class ConfigFileReader {
 	
 	private BufferedReader reader;
 	private HashMap<String, int[]> devices;
+	private HashMap<String, String> strings;
 	
 	public static ConfigFileReader getInstance(){
 		if(instance == null)
@@ -34,6 +37,7 @@ public class ConfigFileReader {
 	public ConfigFileReader(){
 		System.out.println("Loading config file: " + fileName);
 		devices = new HashMap<String, int[]>();
+		strings = new HashMap<String, String>();
 		String currLine = "";
 		try {
 			reader = new BufferedReader(new FileReader(this.getClass().getClassLoader().getResource(fileName).getPath()));
@@ -41,7 +45,10 @@ public class ConfigFileReader {
 			currLine = reader.readLine();
 			while(currLine != null){
 				//Separate the key from the value
-				devices.put(currLine.substring(0, currLine.indexOf(",")), stringToInt(currLine.substring(currLine.indexOf(",") + 1).split(",")));
+				if(wantAString(currLine.substring(0, currLine.indexOf(","))))
+					strings.put(currLine.substring(0, currLine.indexOf(",")), currLine.substring(currLine.indexOf(",") + 1));
+				else
+					devices.put(currLine.substring(0, currLine.indexOf(",")), stringToInt(currLine.substring(currLine.indexOf(",") + 1).split(",")));
 				currLine = reader.readLine();
 			}
 			
@@ -50,6 +57,11 @@ public class ConfigFileReader {
 			System.err.println("Failed to load config file!\t:(");
 			e.printStackTrace();
 		}
+	}
+	
+	private boolean wantAString(String key){
+		return key.equals("axisCamera") ||
+			   key.equals("usbCamera");
 	}
 	
 	private int[] stringToInt(String[] in){
@@ -67,6 +79,10 @@ public class ConfigFileReader {
 	
 	public int getPort(String key){
 		return getPorts(key)[0];
+	}
+	
+	public String[] getString(String key){
+		return new String[]{key, strings.get(key)};
 	}
 	
 }

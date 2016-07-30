@@ -1,5 +1,7 @@
 package interfaces;
 
+import java.util.HashMap;
+
 public abstract class RobotProvider {
 	
 	public static RobotProvider instance;
@@ -8,6 +10,7 @@ public abstract class RobotProvider {
 	protected EncoderReader[] encoders = new EncoderReader[10];
 	protected SolenoidController[] solenoids = new SolenoidController[10];
 	protected GyroReader[] gyros = new GyroReader[5];
+	protected HashMap<String, CameraReader> cams = new HashMap<String, CameraReader>();
 	protected JoystickReader[] joysticks = new JoystickReader[3];
 	
 	//HAL
@@ -18,6 +21,8 @@ public abstract class RobotProvider {
 	public abstract SolenoidController getSolenoid(int index);
 	
 	public abstract GyroReader getGyro(int index);
+	
+	public abstract CameraReader getCamera(String id, String value);
 	
 	//Operator Devices
 	public abstract JoystickReader getJoystick(int index);
