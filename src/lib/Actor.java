@@ -71,6 +71,14 @@ public abstract class Actor implements Runnable{
 		return inbox;
 	}
 	
+	protected void sleep(){
+		try {
+			Thread.sleep(15);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+	}
+	
 	
 	public abstract String toString();
 	
