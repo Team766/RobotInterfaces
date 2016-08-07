@@ -4,6 +4,11 @@ import java.util.concurrent.LinkedBlockingQueue;
 
 public abstract class Actor implements Runnable{
 	
+	private final long SLEEP_TIME = 15;
+	
+	public double itsPerSec = 0;
+	protected boolean done = false;
+	
 	public Class<? extends Message>[] acceptableMessages = (Class<? extends Message>[])new Class[]{};
 	private LinkedBlockingQueue<Message> inbox = new LinkedBlockingQueue<Message>();
 	
@@ -72,8 +77,10 @@ public abstract class Actor implements Runnable{
 	}
 	
 	protected void sleep(){
+		//while(Math.abs(System.currentTimeMillis() % SLEEP_TIME) <= 10);
+		
 		try {
-			Thread.sleep(15);
+			Thread.sleep(SLEEP_TIME);
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
@@ -82,4 +89,7 @@ public abstract class Actor implements Runnable{
 	
 	public abstract String toString();
 	
+	public boolean isDone(){
+		return done;
+	}
 }

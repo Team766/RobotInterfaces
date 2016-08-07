@@ -21,7 +21,7 @@ package lib;
 
 public class PIDController {
 	private int printCounter = 0;
-	private boolean print = false;
+	private boolean print = true;
 
 	private double Kp = 0;
 	private double Ki = 0;
@@ -220,7 +220,7 @@ public class PIDController {
 	}
 
 	private void pr(Object text) {
-		if (print && printCounter > 10){
+		if (print && printCounter > 0){
 			System.out.println("PID: " + text);
 			printCounter = 0;
 		}

@@ -52,5 +52,14 @@ public class Scheduler {
 		}
 		return null;
 	}
+
+	public String getCountsPerSecond() {
+		String out = "Actors\t\tIterations\n";
+		for(Actor clooney : actors){
+			out += clooney.toString() + "\t" + clooney.itsPerSec + "\n";
+			clooney.itsPerSec = 0;
+		}
+		return out;
+	}
 	
 }
