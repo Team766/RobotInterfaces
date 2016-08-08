@@ -85,6 +85,28 @@ public abstract class Actor implements Runnable{
 			e.printStackTrace();
 		}
 	}
+	protected void waitForMessage(Message message, Class<? extends StatusUpdateMessage>... messages){
+		sendMessage(message);
+		
+		StatusUpdateMessage updateMessage;
+		
+		while(true){			
+			for(Message mess : inbox){
+				if(mess instanceof StatusUpdateMessage){
+					updateMessage = ((StatusUpdateMessage) mess);
+					if(updateMessage.getCurrentMessage().equals(message) && updateMessage.isDone()){
+						//Done using it, time to throw it out
+						inbox.remove(mess);
+						return;
+					}
+					//Not important, get rid of it
+					inbox.remove(mess);
+				}
+			}
+			
+			sleep();
+		}
+	}
 	
 	
 	public abstract String toString();
