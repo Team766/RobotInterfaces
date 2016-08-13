@@ -86,6 +86,9 @@ public abstract class Actor implements Runnable{
 		}
 	}
 	protected void waitForMessage(Message message, Class<? extends StatusUpdateMessage>... messages){
+		if(message == null)
+			return;
+		
 		sendMessage(message);
 		
 		StatusUpdateMessage updateMessage;
@@ -94,7 +97,11 @@ public abstract class Actor implements Runnable{
 			for(Message mess : inbox){
 				if(mess instanceof StatusUpdateMessage){
 					updateMessage = ((StatusUpdateMessage) mess);
-					if(updateMessage.getCurrentMessage().equals(message) && updateMessage.isDone()){
+					
+					if(updateMessage.getCurrentMessage() != null &&
+						updateMessage.getCurrentMessage().equals(message) && 
+						updateMessage.isDone()){
+						
 						//Done using it, time to throw it out
 						inbox.remove(mess);
 						return;
