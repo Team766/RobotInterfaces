@@ -5,6 +5,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 public abstract class Actor implements Runnable{
 	
 	private final long SLEEP_TIME = 15;
+	private long lastSleepTime = 0;
 	
 	public double itsPerSec = 0;
 	protected boolean done = false;
@@ -77,13 +78,16 @@ public abstract class Actor implements Runnable{
 	}
 	
 	protected void sleep(){
-		//while(Math.abs(System.currentTimeMillis() % SLEEP_TIME) <= 10);
+		//Run loops at set speed
+		while(System.currentTimeMillis() - lastSleepTime <= SLEEP_TIME);
 		
-		try {
-			Thread.sleep(SLEEP_TIME);
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
+		lastSleepTime = System.currentTimeMillis();
+		
+//		try {
+//			Thread.sleep(SLEEP_TIME);
+//		} catch (InterruptedException e) {
+//			e.printStackTrace();
+//		}
 	}
 	protected void waitForMessage(Message message, Class<? extends StatusUpdateMessage>... messages){
 		sendMessage(message);
