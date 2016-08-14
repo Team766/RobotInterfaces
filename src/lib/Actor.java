@@ -4,6 +4,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 
 public abstract class Actor implements Runnable{
 	
+	private final long RUN_TIME = 20;
 	private final long SLEEP_TIME = 15;
 	private long lastSleepTime = 0;
 	
@@ -79,7 +80,7 @@ public abstract class Actor implements Runnable{
 	
 	protected void sleep(){
 		//Run loops at set speed
-		while(System.currentTimeMillis() - lastSleepTime <= SLEEP_TIME);
+		while(System.currentTimeMillis() - lastSleepTime <= RUN_TIME);
 		
 		lastSleepTime = System.currentTimeMillis();
 		
