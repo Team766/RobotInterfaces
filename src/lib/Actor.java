@@ -81,7 +81,6 @@ public abstract class Actor implements Runnable{
 	protected void sleep(){
 		//Run loops at set speed
 		while(System.currentTimeMillis() - lastSleepTime <= RUN_TIME);
-		
 		lastSleepTime = System.currentTimeMillis();
 		
 //		try {
@@ -122,6 +121,8 @@ public abstract class Actor implements Runnable{
 	
 	
 	public abstract String toString();
+	
+	public abstract void step();
 	
 	public boolean isDone(){
 		return done;

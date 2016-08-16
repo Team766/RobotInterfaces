@@ -11,12 +11,14 @@ public class AutoPaths {
 												"CenterLanePathFar", 
 												"WallLanePath", 
 												"InsideLanePathClose",
-												"StraightAheadPath" };
+												"StraightAheadPath", 
+												"LowGoalPath"};
 	public final static String[] kPathDescriptions = { "Inside, Far",
 														"Middle Lane", 
 														"Wall Lane",
 														"Inside, Close", 
-														"Straight ahead"};
+														"Straight ahead",
+														"Drive to Low goal"};
 	static Hashtable<String, Path> paths_ = new Hashtable<String, Path>();
 
 	public static void loadPaths() {
