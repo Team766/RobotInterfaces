@@ -1,5 +1,7 @@
 package trajectory;
 
+import interfaces.ConfigFileReader;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.Scanner;
@@ -10,7 +12,11 @@ public class ReadPath {
 	public Path getPath(String filePath) {
 		System.out.println(filePath);
 		try {
-			reader = new Scanner(new File(this.getClass().getClassLoader().getResource(filePath).getPath()));
+			if(ConfigFileReader.onRobot)
+				reader = new Scanner(new File("/home/lvuser/trajectories/" + filePath));
+			else
+				reader = new Scanner(new File(this.getClass().getClassLoader().getResource(filePath).getPath()));
+				
 		} catch (FileNotFoundException e) {
 			System.out.println("Error: Path file not opened");
 		}

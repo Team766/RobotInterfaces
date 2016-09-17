@@ -23,6 +23,7 @@ public class ConfigFileReader {
 	private static ConfigFileReader instance;
 	
 	public static String fileName = "";
+	public static boolean onRobot = true;
 	
 	private BufferedReader reader;
 	private HashMap<String, int[]> devices;
@@ -35,12 +36,17 @@ public class ConfigFileReader {
 	}
 	
 	public ConfigFileReader(){
+		onRobot = fileName.equals("config.txt") ? false : true;
+		
 		System.out.println("Loading config file: " + fileName);
 		devices = new HashMap<String, int[]>();
 		strings = new HashMap<String, String>();
 		String currLine = "";
 		try {
-			reader = new BufferedReader(new FileReader(this.getClass().getClassLoader().getResource(fileName).getPath()));
+			if(!onRobot)
+				reader = new BufferedReader(new FileReader(this.getClass().getClassLoader().getResource(fileName).getPath()));
+			else
+				reader = new BufferedReader(new FileReader(fileName));
 			
 			currLine = reader.readLine();
 			while(currLine != null){
@@ -51,8 +57,8 @@ public class ConfigFileReader {
 					devices.put(currLine.substring(0, currLine.indexOf(",")), stringToInt(currLine.substring(currLine.indexOf(",") + 1).split(",")));
 				currLine = reader.readLine();
 			}
-			
 			reader.close();
+
 		} catch (Exception e) {
 			System.err.println("Failed to load config file!\t:(");
 			e.printStackTrace();
