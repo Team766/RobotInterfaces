@@ -38,9 +38,12 @@ public abstract class Actor implements Runnable{
 	
 	protected boolean keepMessage(Message m){
 	    for(Class<? extends Message> message : acceptableMessages){
-	        if(m.getClass().equals(message)){
+	    	if(m.getClass().equals(message)){
+	    	//if(message.getClass().isInstance(m.getClass())){
+	    		System.out.println("Message passed: " + message.getName() + "\t " + m.toString());	
 	            return true;
 	        }
+	    	//LogFactory.getInstance("General").print("Message rejected: " + message.getName());
 	    }
 	    return false;
 	}
@@ -51,6 +54,7 @@ public abstract class Actor implements Runnable{
 	            inbox.put(m);
 	        } catch (InterruptedException e) {
 	            e.printStackTrace();
+	            LogFactory.getInstance("General").print("Failed to add Message:\t" + m);
 	        }
 	    }
 	}
@@ -60,18 +64,21 @@ public abstract class Actor implements Runnable{
 			Scheduler.getInstance().sendMessage(mess);
 		} catch (InterruptedException e) {
 			System.err.println("Failed to send message: " + toString());
+			LogFactory.getInstance("General").print("Actor: Failed to send message: " + toString());
 			e.printStackTrace();
 		}
 	}
 	
 	public Message readMessage(){
-		try {
-			return inbox.take();
-		} catch (InterruptedException e) {
-			System.err.println("Failed to readMessage: " + toString());
-			e.printStackTrace();
-		}
-		return null;
+		return inbox.poll();
+//		try {
+//			return inbox.take();
+//		} catch (InterruptedException e) {
+//			System.err.println("Failed to readMessage: " + toString());
+//			LogFactory.getInstance("General").print("Failed to readMessage: " + toString());
+//			e.printStackTrace();
+//		}
+//		return null;
 	}
 	
 	public LinkedBlockingQueue<Message> getInbox(){
@@ -81,6 +88,7 @@ public abstract class Actor implements Runnable{
 	protected void sleep(){
 		//Run loops at set speed
 		while(System.currentTimeMillis() - lastSleepTime <= RUN_TIME);
+		
 		lastSleepTime = System.currentTimeMillis();
 		
 //		try {
@@ -97,7 +105,7 @@ public abstract class Actor implements Runnable{
 		
 		StatusUpdateMessage updateMessage;
 		
-		while(true){			
+		while(true){
 			for(Message mess : inbox){
 				if(mess instanceof StatusUpdateMessage){
 					updateMessage = ((StatusUpdateMessage) mess);

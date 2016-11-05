@@ -7,7 +7,7 @@ public abstract class RobotProvider {
 	public static RobotProvider instance;
 	
 	protected SpeedController[] motors = new SpeedController[12];
-	protected EncoderReader[] encoders = new EncoderReader[12];
+	protected EncoderReader[] encoders = new EncoderReader[20];
 	protected SolenoidController[] solenoids = new SolenoidController[10];
 	protected GyroReader[] gyros = new GyroReader[13];
 	protected HashMap<String, CameraReader> cams = new HashMap<String, CameraReader>();

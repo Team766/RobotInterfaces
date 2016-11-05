@@ -6,7 +6,7 @@ import java.util.HashMap;
 public class LogFactory {
 	private static HashMap<String, Logger> logs = new HashMap<String, Logger>();
 	
-	public static Logger getInstance(String key){
+	public synchronized static Logger getInstance(String key){
 		return logs.get(key);
 	}
 	
@@ -14,7 +14,7 @@ public class LogFactory {
 	 * Only call in CommandBase init()
 	 * @param key The name of the new log
 	 */
-	public static void createInstance(String key){
+	public synchronized static void createInstance(String key){
 		Logger adding;
 		try {
 			adding = new Logger(key);

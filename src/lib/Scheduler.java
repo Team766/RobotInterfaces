@@ -40,7 +40,7 @@ public class Scheduler {
 	
 	public synchronized void sendMessage(Message newMessage) throws InterruptedException{
 		//Add messages to all Actor's queues
-		for (Actor act : actors) {
+		for(Actor act : actors) {
 			act.tryAddingMessage(newMessage);
 		}
 	}
