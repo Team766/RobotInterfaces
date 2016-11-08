@@ -36,7 +36,7 @@ public class ConfigFileReader {
 	}
 	
 	public ConfigFileReader(){
-		onRobot = !fileName.equals("config.txt");
+		onRobot = !fileName.equals("config.txt") && !fileName.equals("simConfig.txt");
 		
 		System.out.println("Loading config file: " + fileName);
 		devices = new HashMap<String, int[]>();

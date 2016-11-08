@@ -4,7 +4,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 
 public abstract class Actor implements Runnable{
 	
-	private final long RUN_TIME = 20;
+	private final long RUN_TIME = 10;
 	private final long SLEEP_TIME = 15;
 	private long lastSleepTime = 0;
 	
@@ -40,7 +40,6 @@ public abstract class Actor implements Runnable{
 	    for(Class<? extends Message> message : acceptableMessages){
 	    	if(m.getClass().equals(message)){
 	    	//if(message.getClass().isInstance(m.getClass())){
-	    		System.out.println("Message passed: " + message.getName() + "\t " + m.toString());	
 	            return true;
 	        }
 	    	//LogFactory.getInstance("General").print("Message rejected: " + message.getName());
