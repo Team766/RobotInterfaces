@@ -1,18 +1,20 @@
 package lib;
 
+import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.LinkedBlockingQueue;
 
 public abstract class Actor implements Runnable{
 	
 	private final long RUN_TIME = 10;
-	private final long SLEEP_TIME = 15;
+	private final int MAX_MESSAGES = 15;
 	private long lastSleepTime = 0;
 	
 	public double itsPerSec = 0;
 	protected boolean done = false;
 	
 	public Class<? extends Message>[] acceptableMessages = (Class<? extends Message>[])new Class[]{};
-	private LinkedBlockingQueue<Message> inbox = new LinkedBlockingQueue<Message>();
+	//private LinkedBlockingQueue<Message> inbox = new LinkedBlockingQueue<Message>();
+	private LinkedBlockingDeque<Message> inbox = new LinkedBlockingDeque<Message>();
 	
 	public Class<? extends Actor>[] actorHierarchy = (Class<? extends Actor>[])new Class[]{};
 	
@@ -48,8 +50,13 @@ public abstract class Actor implements Runnable{
 	}
 
 	public void tryAddingMessage(Message m){
-	    if(keepMessage(m)){
-	        try {
+		if(keepMessage(m)){	    
+	        //Check for room in inbox
+			if(inbox.size() >= MAX_MESSAGES){
+				inbox.pollFirst();
+			}
+			
+	   	  	try {
 	            inbox.put(m);
 	        } catch (InterruptedException e) {
 	            e.printStackTrace();
@@ -69,7 +76,7 @@ public abstract class Actor implements Runnable{
 	}
 	
 	public Message readMessage(){
-		return inbox.poll();
+		return inbox.pollLast();
 //		try {
 //			return inbox.take();
 //		} catch (InterruptedException e) {
@@ -80,7 +87,7 @@ public abstract class Actor implements Runnable{
 //		return null;
 	}
 	
-	public LinkedBlockingQueue<Message> getInbox(){
+	public LinkedBlockingDeque<Message> getInbox(){
 		return inbox;
 	}
 	
@@ -117,7 +124,8 @@ public abstract class Actor implements Runnable{
 						inbox.remove(mess);
 						return;
 					}
-					//Not important, get rid of it
+				}else{
+					//Not an important message, get rid of it
 					inbox.remove(mess);
 				}
 			}
