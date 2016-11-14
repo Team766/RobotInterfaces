@@ -1,6 +1,6 @@
 package lib;
 
-public abstract class StatusUpdateMessage extends Message{
+public abstract class StatusUpdateMessage implements Message{
 
 	protected boolean isDone = false;
 	protected Message currentExecutingMessage;

@@ -1,5 +1,7 @@
 package lib;
 
+import interfaces.HighPriorityMessage;
+
 import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.LinkedBlockingQueue;
 
@@ -53,7 +55,7 @@ public abstract class Actor implements Runnable{
 		if(keepMessage(m)){	    
 	        //Check for room in inbox
 			if(inbox.size() >= MAX_MESSAGES){
-				inbox.pollFirst();
+				removeMessage();
 			}
 			
 	   	  	try {
@@ -63,6 +65,16 @@ public abstract class Actor implements Runnable{
 	            LogFactory.getInstance("General").print("Failed to add Message:\t" + m);
 	        }
 	    }
+	}
+	
+	private void removeMessage(){
+		for(Message mess : inbox){
+			if(!(mess instanceof HighPriorityMessage)){
+				inbox.remove(mess);
+				return;
+			}
+		}
+		LogFactory.getInstance("General").print("Failed to remove a message, all high priority");
 	}
 	
 	public void sendMessage(Message mess){
@@ -76,7 +88,7 @@ public abstract class Actor implements Runnable{
 	}
 	
 	public Message readMessage(){
-		return inbox.pollLast();
+		return inbox.poll();
 //		try {
 //			return inbox.take();
 //		} catch (InterruptedException e) {
