@@ -2,7 +2,6 @@ package lib;
 
 import interfaces.HighPriorityMessage;
 
-import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.LinkedBlockingQueue;
 
 public abstract class Actor implements Runnable{
@@ -15,8 +14,7 @@ public abstract class Actor implements Runnable{
 	protected boolean done = false;
 	
 	public Class<? extends Message>[] acceptableMessages = (Class<? extends Message>[])new Class[]{};
-	//private LinkedBlockingQueue<Message> inbox = new LinkedBlockingQueue<Message>();
-	private LinkedBlockingDeque<Message> inbox = new LinkedBlockingDeque<Message>();
+	private LinkedBlockingQueue<Message> inbox = new LinkedBlockingQueue<Message>();
 	
 	public Class<? extends Actor>[] actorHierarchy = (Class<? extends Actor>[])new Class[]{};
 	
@@ -99,7 +97,7 @@ public abstract class Actor implements Runnable{
 //		return null;
 	}
 	
-	public LinkedBlockingDeque<Message> getInbox(){
+	public LinkedBlockingQueue<Message> getInbox(){
 		return inbox;
 	}
 	
