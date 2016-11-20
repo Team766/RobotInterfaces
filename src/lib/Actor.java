@@ -38,6 +38,10 @@ public abstract class Actor implements Runnable{
 		return inbox.size() > 0;
 	}
 	
+	public void clearInbox(){
+		inbox.clear();
+	}
+	
 	protected boolean keepMessage(Message m){
 	    for(Class<? extends Message> message : acceptableMessages){
 	    	if(m.getClass().equals(message)){
