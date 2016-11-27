@@ -151,6 +151,11 @@ public abstract class Actor implements Runnable{
 	}
 	
 	
+	public boolean equals(Object obj){
+		Actor act2 = (Actor)obj;
+		return this.getClass().getName().equals(act2.getClass().getName());
+	}
+	
 	public abstract String toString();
 	
 	public abstract void step();

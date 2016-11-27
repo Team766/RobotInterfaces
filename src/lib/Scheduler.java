@@ -1,9 +1,6 @@
 package lib;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.concurrent.LinkedBlockingQueue;
 
 public class Scheduler {
 	
@@ -51,6 +48,13 @@ public class Scheduler {
 				return actor;
 		}
 		return null;
+	}
+	
+	public synchronized void remove(Class<? extends Actor> actor) {
+		for(Actor act : actors){
+			if(act.equals(actor))
+				remove(act);
+		}
 	}
 
 	public String getCountsPerSecond() {
