@@ -11,7 +11,7 @@ public class Scheduler {
 	
 	private ArrayList<Actor> actors;
 	
-	public static Scheduler getInstance(){
+	public static synchronized Scheduler getInstance(){
 		if(instance == null)
 			instance = new Scheduler();
 		

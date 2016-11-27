@@ -45,10 +45,10 @@ public abstract class Actor implements Runnable{
 	protected boolean keepMessage(Message m){
 	    for(Class<? extends Message> message : acceptableMessages){
 	    	if(m.getClass().equals(message)){
-	    	//if(message.getClass().isInstance(m.getClass())){
 	            return true;
 	        }
 	    	//LogFactory.getInstance("General").print("Message rejected: " + message.getName());
+	    	//System.out.println(toString() + " Rejected: " + m.toString());
 	    }
 	    return false;
 	}
@@ -62,6 +62,7 @@ public abstract class Actor implements Runnable{
 			
 	   	  	try {
 	            inbox.put(m);
+	            System.out.println("Adding: " + m.toString());
 	        } catch (InterruptedException e) {
 	            e.printStackTrace();
 	            LogFactory.getInstance("General").print("Failed to add Message:\t" + m);
@@ -72,6 +73,7 @@ public abstract class Actor implements Runnable{
 	private void removeMessage(){
 		for(Message mess : inbox){
 			if(!(mess instanceof HighPriorityMessage)){
+				System.out.println("Removing: " + mess.toString());
 				inbox.remove(mess);
 				return;
 			}
