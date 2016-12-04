@@ -62,7 +62,7 @@ public abstract class Actor implements Runnable{
 			
 	   	  	try {
 	            inbox.put(m);
-	            System.out.println("Adding: " + m.toString());
+//	            System.out.println("Adding: " + m.toString());
 	        } catch (InterruptedException e) {
 	            e.printStackTrace();
 	            LogFactory.getInstance("General").print("Failed to add Message:\t" + m);
@@ -73,7 +73,7 @@ public abstract class Actor implements Runnable{
 	private void removeMessage(){
 		for(Message mess : inbox){
 			if(!(mess instanceof HighPriorityMessage)){
-				System.out.println("Removing: " + mess.toString());
+				//System.out.println("Removing: " + mess.toString());
 				inbox.remove(mess);
 				return;
 			}
@@ -152,8 +152,7 @@ public abstract class Actor implements Runnable{
 	
 	
 	public boolean equals(Object obj){
-		Actor act2 = (Actor)obj;
-		return this.getClass().getName().equals(act2.getClass().getName());
+		return this.getClass().getName().equals(obj.getClass().getName());
 	}
 	
 	public abstract String toString();

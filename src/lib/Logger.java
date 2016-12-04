@@ -20,25 +20,22 @@ public class Logger {
 
 	private String html = "<head><meta http-equiv=\"refresh\" content=\"1\"></head><body style=\"background-color:rgba(180, 28, 28, 0.8)\">";
 	
-	public Logger(){
-		htmlOnly = true;
-		html += "<h2 style = \"color: white\">" + name + "</h2>  <p style = \"color: #fc4\">";
-		startTime = System.currentTimeMillis() / 1000l;
-	}
-	
-	public Logger(String fileName) throws IOException {
+	public Logger(String fileName) {
 		name = fileName;
+		
+		html += "<h2 style = \"color: white\">" + name + "</h2>  <p style = \"color: #fc4\">";
+		htmlOnly = false;
+		
 		try {
 			System.out.println(new File("/media/sda1/" + LogFolder).mkdir());
 			pw = new PrintWriter(new FileWriter("/media/sda1/" + LogFolder + "/" + name + ".txt"));
-			startTime = System.currentTimeMillis() / 1000l;
 		} catch (IOException e) {
+			htmlOnly = true;
 			System.out.println(e.getMessage());
 			System.out.println("Something went wrong in the log's constructor");
-			throw e;
 		}
-		html += "<h2 style = \"color: white\">" + name + "</h2>  <p style = \"color: #fc4\">";
-		htmlOnly = false;
+		startTime = System.currentTimeMillis() / 1000l;
+
 	}
 
 	public void print(String message) {

@@ -15,12 +15,7 @@ public class LogFactory {
 	 * @param key The name of the new log
 	 */
 	public synchronized static void createInstance(String key){
-		Logger adding;
-		try {
-			adding = new Logger(key);
-		} catch (IOException e) {
-			adding = new Logger();
-		}
+		Logger adding = new Logger(key);
 		logs.put(key, adding);
 	}
 	

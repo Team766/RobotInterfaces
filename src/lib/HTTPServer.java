@@ -61,7 +61,7 @@ public class HTTPServer extends Filter implements Runnable{
 				os.close();
     	    }
 		});
-		
+				
 		for(Logger log : LogFactory.getLogs().values()){
 			server.createContext("/logs/" + log.getName(), new HttpHandler(){
 				public void handle(HttpExchange exchange) throws IOException {
