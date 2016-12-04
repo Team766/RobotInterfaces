@@ -65,7 +65,7 @@ public class HTTPServer extends Filter implements Runnable{
 		for(Logger log : LogFactory.getLogs().values()){
 			server.createContext("/logs/" + log.getName(), new HttpHandler(){
 				public void handle(HttpExchange exchange) throws IOException {
-					String response = log.getHTML() + "<form action=\"values\"><button name=\"subject\" type=\"submit\" value=\"clearLog" + log.getName() + "\">Clear</button></form></html>";
+					String response = log.getHTML() + "<form action=\"../values\"><button name=\"subject\" type=\"submit\" value=\"clearLog" + log.getName() + "\">Clear</button></form></html>";
 					exchange.sendResponseHeaders(200, response.getBytes().length);
 					OutputStream os = exchange.getResponseBody();
 					os.write(response.getBytes());
@@ -83,6 +83,8 @@ public class HTTPServer extends Filter implements Runnable{
 						//Loop through the hashMap to display values
 						r +=  "<p>" + buildForm("Time of Match", 12) + "</p>"
 						+ "<p>" + buildForm("Auton") + "</p>"
+						+ "<p>" + buildForm("Clear", "General") + "</p>"
+						//+ "<p>" + buildDropDown("Clear", "", LogFactory.getLogs().keySet().toArray(new String[]{})) + "</p>"
 						+ "<p>" + buildDropDown("AutoMode", AUTONS[RobotValues.AutonMode], AUTONS) + "</p>";
 												
 						r += "<input type=\"submit\" value=\"Submit\" onclick \"myFunction()\"></form>"
@@ -111,6 +113,12 @@ public class HTTPServer extends Filter implements Runnable{
 		        				if(AUTONS[i].equals(pair.getValue()))
 		        					RobotValues.AutonMode = i;
 		        			}
+		        		}
+
+		        		if(pair.getKey().equals("clear")){
+		        			//clear log sent
+		        			LogFactory.getInstance(pair.getValue().toString()).clearHTML();
+		        			System.out.println("Clearing log: " + pair.getValue().toString());
 		        		}
 		        			
 		        		values.put((String)pair.getKey(), (String)pair.getValue());
@@ -156,6 +164,10 @@ public class HTTPServer extends Filter implements Runnable{
 	}
 	
 	private static String buildForm(String valueName, double v){
+		return buildForm(valueName, "" + v);
+	}
+	
+	private static String buildForm(String valueName, String v){
 		String id = valueName.replace(' ', '_');
 		return "<label for=\"" + id.toUpperCase() + "\">" + valueName + ":</label>"
 				+ "<input name=\"" + id.toLowerCase() + "\" id=\"" + id.toUpperCase() + "\" type=\"text\" value=\"" + v + "\"/>";
