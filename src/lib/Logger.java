@@ -50,11 +50,11 @@ public class Logger {
 		}else{
 			try {
 				if (INDENT) {
+					html += getHtmlTime() + "\t\t" + message + "<br>";
 					pw.println(getTime() + "\t\t" + message);
-					html += getHtmlTime() + "\t\t" + message + "<br>";
 				} else {
-					pw.println(getTime() + "\t" + message);
 					html += getHtmlTime() + "\t\t" + message + "<br>";
+					pw.println(getTime() + "\t" + message);
 				}
 			} catch (NullPointerException e) {
 				System.out.println("Null Pointer alert!");
@@ -67,8 +67,8 @@ public class Logger {
 			html += in + "<br>";
 		else{
 			try {
-				pw.println(in);
 				html += in + "<br>";
+				pw.println(in);
 			} catch (NullPointerException e) {
 				System.out.println("Can't print raw value: " + in);
 			}
@@ -84,13 +84,13 @@ public class Logger {
 		}else{
 			try {
 				if (INDENT) {
-					pw.println(getTime() + "\t\t" + message + value);
 					html += getHtmlTime() + "\t\t" + message + value + "<br>";
+					pw.println(getTime() + "\t\t" + message + value);
 				}
 	
 				else {
-					pw.println(getTime() + "\t" + message + value);
 					html += getHtmlTime() + "\t" + message + value + "<br>";
+					pw.println(getTime() + "\t" + message + value);
 				}
 			} catch (NullPointerException e) {
 				System.out.println("Can't save log!");

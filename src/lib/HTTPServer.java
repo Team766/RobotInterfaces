@@ -84,7 +84,7 @@ public class HTTPServer extends Filter implements Runnable{
 						r +=  "<p>" + buildForm("Time of Match", 12) + "</p>"
 						+ "<p>" + buildForm("Auton") + "</p>"
 						+ "<p>" + buildDropDown("AutoMode", AUTONS[RobotValues.AutonMode], AUTONS) + "</p>";
-				
+												
 						r += "<input type=\"submit\" value=\"Submit\" onclick \"myFunction()\"></form>"
 						+ "<input type=\"submit\" value=\"Go to /display\" "
 						+ "onclick=\"window.location='/display';\" />"
