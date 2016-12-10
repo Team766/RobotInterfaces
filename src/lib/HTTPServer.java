@@ -115,7 +115,7 @@ public class HTTPServer extends Filter implements Runnable{
 		        			}
 		        		}
 
-		        		if(pair.getKey().equals("clear")){
+		        		if(pair.getKey().equals("clear") && pair.getValue() != null){
 		        			//clear log sent
 		        			LogFactory.getInstance(pair.getValue().toString()).clearHTML();
 		        			System.out.println("Clearing log: " + pair.getValue().toString());
