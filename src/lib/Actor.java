@@ -6,9 +6,11 @@ import java.util.concurrent.LinkedBlockingQueue;
 
 public abstract class Actor implements Runnable{
 	
-	private final long RUN_TIME = 10;
+	private final long RUN_TIME = 10;	//	1 / (Hz) --> to milliseconds
+	private final long MIN_SLEEP_TIME = 1;
+	
 	private final int MAX_MESSAGES = 15;
-	private long lastSleepTime = 0;
+	private long lastSleepTime;
 	
 	public double itsPerSec = 0;
 	protected boolean done = false;
@@ -19,6 +21,10 @@ public abstract class Actor implements Runnable{
 	public Class<? extends Actor>[] actorHierarchy = (Class<? extends Actor>[])new Class[]{};
 	
 	public boolean enabled = true;
+	
+	public Actor(){
+		lastSleepTime = System.currentTimeMillis();
+	}
 	
 	public abstract void init();
 	
@@ -108,17 +114,24 @@ public abstract class Actor implements Runnable{
 	}
 	
 	protected void sleep(){
+		sleep(RUN_TIME);
+	}
+	
+	protected void sleep(long sleepTime){
 		//Run loops at set speed
-		while(System.currentTimeMillis() - lastSleepTime <= RUN_TIME);
+		try {
+			//System.out.println("Curr: " + System.currentTimeMillis() + "\tLast: " + lastSleepTime);
+			Thread.sleep(sleepTime - (System.currentTimeMillis() - lastSleepTime));
+		} catch (Exception e) {
+			System.out.println(toString() + "\tNo time to sleep, running behind schedule!!");
+			try {
+				Thread.sleep(MIN_SLEEP_TIME);
+			} catch (InterruptedException e1) {}
+		}
 		
 		lastSleepTime = System.currentTimeMillis();
-		
-//		try {
-//			Thread.sleep(SLEEP_TIME);
-//		} catch (InterruptedException e) {
-//			e.printStackTrace();
-//		}
 	}
+	
 	protected void waitForMessage(Message message, Class<? extends StatusUpdateMessage>... messages){
 		if(message == null)
 			return;
