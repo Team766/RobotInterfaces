@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
 
 public class Logger {
 
@@ -13,6 +14,8 @@ public class Logger {
 	private long startTime = 0;
 	private boolean INDENT = false;
 	private String name;
+	
+	private HashMap<String, Integer> iterations = new HashMap<String, Integer>();
 	
 	private boolean htmlOnly;
 	
@@ -56,6 +59,20 @@ public class Logger {
 			} catch (NullPointerException e) {
 				System.out.println("Null Pointer alert!");
 			}
+		}
+	}
+	
+	public void printPeriodic(String message, String key, int iters){
+		if(!iterations.containsKey(key)){
+			iterations.put(key, 0);
+			return;
+		}
+		
+		if(iterations.get(key) > iters){
+			print("-P " + message);
+			iterations.put(key, 0);
+		}else{
+			iterations.put(key, iterations.get(key) + 1);
 		}
 	}
 
