@@ -1,7 +1,7 @@
 package interfaces;
 
 public interface SubActor {
-	public void update(double[] vals);
+	public void update();
 	public void stop();
 	public boolean isDone();
 }
