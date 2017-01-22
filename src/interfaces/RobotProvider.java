@@ -26,4 +26,6 @@ public abstract class RobotProvider {
 	
 	//Operator Devices
 	public abstract JoystickReader getJoystick(int index);
+	
+	public abstract CameraInterface getCamServer();
 }
