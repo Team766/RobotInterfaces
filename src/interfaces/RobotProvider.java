@@ -19,7 +19,7 @@ public abstract class RobotProvider {
 	
 	public abstract EncoderReader getEncoder(int index1, int index2);
 	
-	public abstract DigitalInputReader getDigitialInputer(int index);
+	public abstract DigitalInputReader getDigitalInput(int index);
 	
 	public abstract SolenoidController getSolenoid(int index);
 	
