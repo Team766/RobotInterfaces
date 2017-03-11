@@ -13,6 +13,7 @@ public abstract class RobotProvider {
 	protected HashMap<String, CameraReader> cams = new HashMap<String, CameraReader>();
 	protected JoystickReader[] joysticks = new JoystickReader[3];
 	protected DigitalInputReader[] digInputs = new DigitalInputReader[5];
+	protected AnalogInputReader[] angInputs = new AnalogInputReader[5];
 	
 	//HAL
 	public abstract SpeedController getMotor(int index);
@@ -20,6 +21,8 @@ public abstract class RobotProvider {
 	public abstract EncoderReader getEncoder(int index1, int index2);
 	
 	public abstract DigitalInputReader getDigitalInput(int index);
+	
+	public abstract AnalogInputReader getAnalogInput(int index);
 	
 	public abstract SolenoidController getSolenoid(int index);
 	

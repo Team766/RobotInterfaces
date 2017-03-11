@@ -1,5 +1,5 @@
 package lib;
 
 public abstract class RobotValues {
-	public static int AutonMode = 0;
+	public static int AutonMode = 1;
 }
