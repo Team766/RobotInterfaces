@@ -20,6 +20,10 @@ public class Scheduler {
 	}
 	
 	public synchronized void add(Actor act){
+		for(Actor a : actors){
+			if(a.toString().equals(act.toString()))
+				return;
+		}
 		actors.add(act);
 		act.init();
 		new Thread(act).start();

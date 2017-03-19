@@ -12,7 +12,7 @@ public abstract class RobotProvider {
 	protected GyroReader[] gyros = new GyroReader[13];
 	protected HashMap<String, CameraReader> cams = new HashMap<String, CameraReader>();
 	protected JoystickReader[] joysticks = new JoystickReader[3];
-	protected DigitalInputReader[] digInputs = new DigitalInputReader[5];
+	protected DigitalInputReader[] digInputs = new DigitalInputReader[8];
 	protected AnalogInputReader[] angInputs = new AnalogInputReader[5];
 	
 	//HAL
