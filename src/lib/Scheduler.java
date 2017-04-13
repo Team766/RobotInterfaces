@@ -21,8 +21,10 @@ public class Scheduler {
 	
 	public synchronized void add(Actor act){
 		for(Actor a : actors){
-			if(a.toString().equals(act.toString()))
+			if(a.toString().equals(act.toString())){
+				System.err.println("Scheduler: " + act + " already added to schedueler");
 				return;
+			}
 		}
 		actors.add(act);
 		act.init();
@@ -34,8 +36,9 @@ public class Scheduler {
 		
 		//Remove ALL instances of it from list
 		for(int i = actors.size() - 1; i >= 0; i--){
-			if(actors.get(i).toString().equals(actor.toString()))
+			if(actors.get(i).toString().equals(actor.toString())){
 				actors.remove(i);
+			}
 		}
 	}
 	
@@ -55,10 +58,15 @@ public class Scheduler {
 	}
 	
 	public synchronized void remove(Class<? extends Actor> actor) {
+		//Avoid comodifications to the actors arraylist
+		Actor dieingActor = null;
+		
 		for(Actor act : actors){
-			if(act.equals(actor))
-				remove(act);
+			if(act.getClass().isAssignableFrom(actor))
+				dieingActor = act;
 		}
+		if(dieingActor != null)
+			remove(dieingActor);
 	}
 
 	public String getCountsPerSecond() {

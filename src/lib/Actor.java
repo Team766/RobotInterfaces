@@ -141,7 +141,7 @@ public abstract class Actor implements Runnable{
 		
 		StatusUpdateMessage updateMessage;
 		
-		while(true){
+		while(enabled){
 			for(Message mess : inbox){
 				if(mess instanceof StatusUpdateMessage){
 					updateMessage = ((StatusUpdateMessage) mess);
