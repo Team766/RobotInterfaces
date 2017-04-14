@@ -173,6 +173,8 @@ public abstract class Actor implements Runnable{
 	
 	public abstract void step();
 	
+	public abstract void iterate();
+	
 	public boolean isDone(){
 		return done;
 	}

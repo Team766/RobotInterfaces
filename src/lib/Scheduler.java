@@ -68,6 +68,22 @@ public class Scheduler {
 		if(dieingActor != null)
 			remove(dieingActor);
 	}
+	
+	
+	/**
+	 * Empties entire list of actors
+	 * 
+	 * Used so tests get reset between each one.
+	 */
+	public synchronized void reset(){
+		//Kill all current actors
+		for(Actor clooney : actors){
+			clooney.enabled = false;
+		}
+		
+		actors.clear();
+		instance = null;
+	}
 
 	public String getCountsPerSecond() {
 		String out = "Actors\t\tIterations\n";
