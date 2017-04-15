@@ -21,8 +21,10 @@ public class Scheduler {
 	
 	public synchronized void add(Actor act){
 		for(Actor a : actors){
-			if(a.toString().equals(act.toString()))
+			if(a.toString().equals(act.toString())){
+				System.err.println("Scheduler: " + act + " already added to schedueler");
 				return;
+			}
 		}
 		act.enabled = true;
 		actors.add(act);
@@ -57,10 +59,31 @@ public class Scheduler {
 	}
 	
 	public synchronized void remove(Class<? extends Actor> actor) {
+		//Avoid comodifications to the actors arraylist
+		Actor dieingActor = null;
+		
 		for(Actor act : actors){
-			if(act.equals(actor))
-				remove(act);
+			if(act.getClass().isAssignableFrom(actor))
+				dieingActor = act;
 		}
+		if(dieingActor != null)
+			remove(dieingActor);
+	}
+	
+	
+	/**
+	 * Empties entire list of actors
+	 * 
+	 * Used so tests get reset between each one.
+	 */
+	public synchronized void reset(){
+		//Kill all current actors
+		for(Actor clooney : actors){
+			clooney.enabled = false;
+		}
+		
+		actors.clear();
+		instance = null;
 	}
 
 	public String getCountsPerSecond() {
