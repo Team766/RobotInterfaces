@@ -42,74 +42,74 @@ public class Logger {
 	}
 
 	public void print(String message) {
-		if(htmlOnly){
-			if(INDENT)
-				html += getHtmlTime() + "\t\t" + message + "<br>";
-			else
-				html += getHtmlTime() + "\t\t" + message + "<br>";
-		}else{
-			try {
-				if (INDENT) {
-					html += getHtmlTime() + "\t\t" + message + "<br>";
-					pw.println(getTime() + "\t\t" + message);
-				} else {
-					html += getHtmlTime() + "\t\t" + message + "<br>";
-					pw.println(getTime() + "\t" + message);
-				}
-			} catch (NullPointerException e) {
-				System.out.println("Null Pointer alert!");
-			}
-		}
+//		if(htmlOnly){
+//			if(INDENT)
+//				html += getHtmlTime() + "\t\t" + message + "<br>";
+//			else
+//				html += getHtmlTime() + "\t\t" + message + "<br>";
+//		}else{
+//			try {
+//				if (INDENT) {
+//					html += getHtmlTime() + "\t\t" + message + "<br>";
+//					pw.println(getTime() + "\t\t" + message);
+//				} else {
+//					html += getHtmlTime() + "\t\t" + message + "<br>";
+//					pw.println(getTime() + "\t" + message);
+//				}
+//			} catch (NullPointerException e) {
+//				System.out.println("Null Pointer alert!");
+//			}
+//		}
 	}
 	
 	public void printPeriodic(String message, String key, int iters){
-		if(!iterations.containsKey(key)){
-			iterations.put(key, 0);
-			return;
-		}
-		
-		if(iterations.get(key) > iters){
-			print("-P " + message);
-			iterations.put(key, 0);
-		}else{
-			iterations.put(key, iterations.get(key) + 1);
-		}
+//		if(!iterations.containsKey(key)){
+//			iterations.put(key, 0);
+//			return;
+//		}
+//		
+//		if(iterations.get(key) > iters){
+//			print("-P " + message);
+//			iterations.put(key, 0);
+//		}else{
+//			iterations.put(key, iterations.get(key) + 1);
+//		}
 	}
 
 	public void printRaw(String in) {
-		if(htmlOnly)
-			html += in + "<br>";
-		else{
-			try {
-				html += in + "<br>";
-				pw.println(in);
-			} catch (NullPointerException e) {
-				System.out.println("Can't print raw value: " + in);
-			}
-		}
+//		if(htmlOnly)
+//			html += in + "<br>";
+//		else{
+//			try {
+//				html += in + "<br>";
+//				pw.println(in);
+//			} catch (NullPointerException e) {
+//				System.out.println("Can't print raw value: " + in);
+//			}
+//		}
 	}
 
 	public void print(String message, int value) {
-		if(htmlOnly){
-			if(INDENT)
-				html += getHtmlTime() + "\t\t" + message + value + "<br>";
-			else
-				html += getHtmlTime() + "\t" + message + value + "<br>";
-		}else{
-			try {
-				if (INDENT) {
-					html += getHtmlTime() + "\t\t" + message + value + "<br>";
-					pw.println(getTime() + "\t\t" + message + value);
-				}
-	
-				else {
-					html += getHtmlTime() + "\t" + message + value + "<br>";
-					pw.println(getTime() + "\t" + message + value);
-				}
-			} catch (NullPointerException e) {
-				System.out.println("Can't save log!");
-			}
-		}
+//		if(htmlOnly){
+//			if(INDENT)
+//				html += getHtmlTime() + "\t\t" + message + value + "<br>";
+//			else
+//				html += getHtmlTime() + "\t" + message + value + "<br>";
+//		}else{
+//			try {
+//				if (INDENT) {
+//					html += getHtmlTime() + "\t\t" + message + value + "<br>";
+//					pw.println(getTime() + "\t\t" + message + value);
+//				}
+//	
+//				else {
+//					html += getHtmlTime() + "\t" + message + value + "<br>";
+//					pw.println(getTime() + "\t" + message + value);
+//				}
+//			} catch (NullPointerException e) {
+//				System.out.println("Can't save log!");
+//			}
+//		}
 	}
 
 	public void closeFile() {

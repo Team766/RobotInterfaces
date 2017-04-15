@@ -24,6 +24,7 @@ public class Scheduler {
 			if(a.toString().equals(act.toString()))
 				return;
 		}
+		act.enabled = true;
 		actors.add(act);
 		act.init();
 		new Thread(act).start();
@@ -34,8 +35,9 @@ public class Scheduler {
 		
 		//Remove ALL instances of it from list
 		for(int i = actors.size() - 1; i >= 0; i--){
-			if(actors.get(i).toString().equals(actor.toString()))
+			if(actors.get(i).toString().equals(actor.toString())){
 				actors.remove(i);
+			}
 		}
 	}
 	
