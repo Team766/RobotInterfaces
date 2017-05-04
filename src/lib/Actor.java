@@ -2,6 +2,7 @@ package lib;
 
 import interfaces.HighPriorityMessage;
 
+import java.util.Arrays;
 import java.util.concurrent.LinkedBlockingQueue;
 
 public abstract class Actor implements Runnable{
@@ -164,6 +165,14 @@ public abstract class Actor implements Runnable{
 		}
 	}
 	
+	protected void log(String message){
+		sendMessage(new LogMessage(getSourceClass() + ": " + message));
+	}
+	
+	private String getSourceClass(){
+		Object[] out = Thread.currentThread().getStackTrace();
+		return out[out.length - 2].toString();
+	}
 	
 	public boolean equals(Object obj){
 		return this.getClass().getName().equals(obj.getClass().getName());
