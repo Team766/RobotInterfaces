@@ -113,11 +113,11 @@ public class Logger {
 	}
 
 	public void closeFile() {
-		try {
-			pw.close();
-		} catch (NullPointerException e) {
-			System.out.println("Can't save log!");
-		}
+//		try {
+//			pw.close();
+//		} catch (NullPointerException e) {
+//			System.out.println("Can't save log!");
+//		}
 	}
 
 	private String getTime() {
