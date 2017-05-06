@@ -16,7 +16,11 @@ public abstract class RobotProvider {
 	protected AnalogInputReader[] angInputs = new AnalogInputReader[5];
 	
 	//HAL
-	public abstract SpeedController getMotor(int index);
+	public abstract SpeedController getMotor(int index, boolean isCAN);
+	
+	public SpeedController getMotor(int index){
+		return getMotor(index, false);
+	}
 	
 	public abstract EncoderReader getEncoder(int index1, int index2);
 	
