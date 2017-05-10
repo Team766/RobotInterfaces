@@ -1,6 +1,8 @@
-from Tkinter import * 
+import matplotlib
+matplotlib.use('TkAgg')
 import matplotlib.pyplot as plt
 import sys
+from Tkinter import * 
 
 # def onObjectClick(event):                  
 #     print('Got object click', event.x, event.y)
@@ -46,7 +48,7 @@ def timeInSecs(time):
 	return (float(chunks[0]) * 3600.0) + (float(chunks[1]) * 60.0) + float(chunks[2])
 
 def getAdjustedTime(time):
-	return timeInSecs(time) - START_TIME
+	return (timeInSecs(time) - START_TIME)
 
 #Adds val to every element in array
 def shiftArrayByOffset(val, array):
@@ -69,6 +71,7 @@ def main():
 		logLines.append(A)
 		#logLines.append(lineSegment[:3].append(' '.join(lineSegment[3:])))
 
+	global START_TIME
 	START_TIME = float(timeInSecs(logLines[0][1]))
 
 	graphValuesX = []
@@ -157,6 +160,8 @@ def main():
 	scrollbar.config(command = mylist.yview)
 
 	print graphValuesX
+	print graphValuesY
+
 
 	#Display graph, if applicable
 	if(len(graph_values) > 0):
