@@ -57,9 +57,21 @@ def shiftArrayByOffset(val, array):
 		outArray.append(float(num) + val)
 	return outArray
 
+#str: X: val1 Y: val2
+#val X
+#returns val1
+def getValueFromString(val, str):
+	components = str.split(" ")
+	for i in range(0, len(components) - 1):
+		if(val in components[i]):
+			return components[i + 1]
+	return None
+
 def main():
 	if(len(sys.argv) < 2):
 		sys.exit(HELP_OUTPUT)
+	if(len(sys.argv) % 2 == 1):
+		sys.exit("Invalid flag format")
 
 	logLines = []
 	inputfile = open(sys.argv[1])
@@ -122,21 +134,19 @@ def main():
 			if(getAdjustedTime(logLines[line][1]) < timeInterval[0] or getAdjustedTime(logLines[line][1]) > timeInterval[1]):
 				continue
 		if(len(graph_values) > 0):
-			if((not "GRAPH" in logLines[line][3]) or (not allValsInArray(logLines[line][3], graph_values))):
+			if(not valueInArray(graph_values, logLines[line][3])):
 				continue
 			else:
-				#Proper Graph line: GRAPH X: val Y: val
-				#Or for just one line: GRAPH X: val
+				#Proper Graph line: X: val Y: val
+				#Or for just one line: X: val
 
 				#Graphing one value vs time
 				if(len(graph_values) == 1):
 					graphValuesX.append(getAdjustedTime(logLines[line][1]))
-					graphValuesY.append(logLines[line][3].split(" ")[2])
+					graphValuesY.append(getValueFromString(graph_values[0], logLines[line][3]))
 				else:
-					lineSplit = logLines[line][3].split(" ")[1:] # values without GRAPH
-					graphValuesX.append(lineSplit[1])
-					graphValuesY.append(lineSplit[3])
-
+					graphValuesX.append(getValueFromString(graph_values[0], logLines[line][3]))
+					graphValuesY.append(getValueFromString(graph_values[1], logLines[line][3]))
 
 		mylist.insert(END, logLines[line])
 
@@ -156,21 +166,27 @@ def main():
 	   		mylist.itemconfig(END, {'fg':'black'})
 	   		mylist.itemconfig(END, {'bg':'white'})
 
+	#Remove Nones from the lists to be graphed
+	graphValuesX = [x for x in graphValuesX if x is not None]
+	graphValuesY = [y for y in graphValuesY if y is not None]
+
 	mylist.pack(side = LEFT, fill = BOTH)
 	scrollbar.config(command = mylist.yview)
 
-	print graphValuesX
-	print graphValuesY
+	# print graphValuesX
+	# print graphValuesY
 
 
 	#Display graph, if applicable
 	if(len(graph_values) > 0):
-		plt.plot(graphValuesX, graphValuesY)
-		plt.xlabel(graph_values[0])
 		if(len(graph_values) == 1):
-			plt.ylabel("Time")
+			plt.xlabel("Time")
+			plt.ylabel(graph_values[0])
+			plt.plot(graphValuesX, graphValuesY)
 		else:
+			plt.xlabel(graph_values[0])
 			plt.ylabel(graph_values[1])
+			plt.plot(graphValuesX, graphValuesY, "o")
 		plt.show()
 	
 	mainloop()
