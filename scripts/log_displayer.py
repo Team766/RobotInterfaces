@@ -3,6 +3,8 @@ matplotlib.use('TkAgg')
 import matplotlib.pyplot as plt
 import sys
 from Tkinter import * 
+from ftplib import FTP
+from StringIO import StringIO
 
 # def onObjectClick(event):                  
 #     print('Got object click', event.x, event.y)
@@ -20,6 +22,8 @@ Sample Usage: python log_displayer.py SampleLog.txt
 python log_displayer.py SampleLog.txt -n Drive -l FATAL
 
 Flags:
+	-f Replace file name with this flag to grab file from robot
+
 	-n Name of subsystems			
 	-l Level
 	-m messages with certain subject
@@ -28,6 +32,7 @@ Flags:
 	-g graph one value against time with GRAPH X: val using -g X
 """
 START_TIME = 0;
+FILE_NAME = "SampleLog.txt"
 
 def valueInArray(a1, s1):
 	for x in a1:
@@ -74,14 +79,27 @@ def main():
 		sys.exit("Invalid flag format")
 
 	logLines = []
-	inputfile = open(sys.argv[1])
-	#Each line in logLines: [LEVEL, TIME, LOCATION, MESSAGE]
-	for line in inputfile:
-		lineSegment = line.split()
-		A = lineSegment[:3]
-		A.append(' '.join(lineSegment[3:]))
-		logLines.append(A)
-		#logLines.append(lineSegment[:3].append(' '.join(lineSegment[3:])))
+
+	#Check if grabbing file from ftp of robot or locally
+	if(sys.argv[1] == "-f"):
+		ftp = FTP('roborio-766-frc.local')
+		ftp.login("admin", "")
+		ftp.cwd("/home/lvuser/")
+		r = StringIO()
+		ftp.retrbinary('RETR ' + FILE_NAME, r.write)
+		logLines = r.getvalue().split("\n")
+		ftp.quit()
+		r.close()
+	else:
+		inputfile = open(sys.argv[1])
+		#Each line in logLines: [LEVEL, TIME, LOCATION, MESSAGE]
+		for line in inputfile:
+			lineSegment = line.split()
+			#Group all the elements in the message section together
+			A = lineSegment[:3]
+			A.append(' '.join(lineSegment[3:]))
+			logLines.append(A)
+			#logLines.append(lineSegment[:3].append(' '.join(lineSegment[3:])))
 
 	global START_TIME
 	START_TIME = float(timeInSecs(logLines[0][1]))
