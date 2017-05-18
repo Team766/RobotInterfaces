@@ -32,7 +32,7 @@ Flags:
 	-g graph one value against time with GRAPH X: val using -g X
 """
 START_TIME = 0;
-FILE_NAME = "SampleLog.txt"
+FILE_NAME = "testLog.txt"
 
 def valueInArray(a1, s1):
 	for x in a1:
@@ -83,23 +83,25 @@ def main():
 	#Check if grabbing file from ftp of robot or locally
 	if(sys.argv[1] == "-f"):
 		ftp = FTP('roborio-766-frc.local')
-		ftp.login("admin", "")
+		ftp.login()
 		ftp.cwd("/home/lvuser/")
 		r = StringIO()
 		ftp.retrbinary('RETR ' + FILE_NAME, r.write)
-		logLines = r.getvalue().split("\n")
+		inputfile = r.getvalue().split("\n")
 		ftp.quit()
 		r.close()
+
 	else:
 		inputfile = open(sys.argv[1])
-		#Each line in logLines: [LEVEL, TIME, LOCATION, MESSAGE]
-		for line in inputfile:
-			lineSegment = line.split()
-			#Group all the elements in the message section together
-			A = lineSegment[:3]
-			A.append(' '.join(lineSegment[3:]))
-			logLines.append(A)
-			#logLines.append(lineSegment[:3].append(' '.join(lineSegment[3:])))
+
+	#Each line in logLines: [LEVEL, TIME, LOCATION, MESSAGE]
+	for line in inputfile:
+		lineSegment = line.split()
+		#Group all the elements in the message section together
+		A = lineSegment[:3]
+		A.append(' '.join(lineSegment[3:]))
+		logLines.append(A)
+		#logLines.append(lineSegment[:3].append(' '.join(lineSegment[3:])))
 
 	global START_TIME
 	START_TIME = float(timeInSecs(logLines[0][1]))
@@ -137,7 +139,7 @@ def main():
 	mylist.config(width=0)
 
 	#Add the lines to the display
-	for line in range(0,len(logLines)):
+	for line in range(0, len(logLines) - 1):
 		#Filter messages by level and subsytem name
 		if(len(subsystems) > 0):
 			if(not valueInArray(subsystems, logLines[line][2])):
