@@ -22,10 +22,10 @@ Sample Usage: python log_displayer.py SampleLog.txt
 python log_displayer.py SampleLog.txt -n Drive -l FATAL
 
 Flags:
-	-f Replace file name with this flag to grab file from robot
-
+	-f FTP file off the RoboRio: true/false
 	-n Name of subsystems			
 	-l Level
+	-c Continous graphing: true/false
 	-m messages with certain subject
 	-t time interval -t hh:mm:ss-hh:mm:ss
 	-g graph values from messages with GRAPH X: val, Y: val using -g X,Y
@@ -75,13 +75,13 @@ def getValueFromString(val, str):
 def main():
 	if(len(sys.argv) < 2):
 		sys.exit(HELP_OUTPUT)
-	if(len(sys.argv) % 2 == 1):
-		sys.exit("Invalid flag format")
 
 	logLines = []
 
+	FILE_NAME = sys.argv[1]
+
 	#Check if grabbing file from ftp of robot or locally
-	if(sys.argv[1] == "-f"):
+	if("-f" in sys.argv):
 		ftp = FTP('roborio-766-frc.local')
 		ftp.login()
 		ftp.cwd("/home/lvuser/")
