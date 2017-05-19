@@ -28,6 +28,7 @@ public class ConstantsFileReader {
 	
 	private BufferedReader reader;
 	private HashMap<String, Double> constants;
+	private HashMap<String, String> constantStr;
 	
 	public static ConstantsFileReader getInstance(){
 		if(instance == null)
@@ -39,11 +40,16 @@ public class ConstantsFileReader {
 		return constants.containsKey(key) ? constants.get(key) : 0.0;
 	}
 	
+	public String getStr(String key){
+		return constantStr.containsKey(key) ? constantStr.get(key) : "";
+	}
+	
 	public ConstantsFileReader(){
 		onRobot = fileName.equals("constants.csv") || !fileName.equals("simConstants.csv");
 		
 		System.out.println("Loading constants file: " + fileName);
 		constants = new HashMap<String, Double>();
+		constantStr = new HashMap<String, String>();
 		
 		loadConstants();
 	}
@@ -62,7 +68,11 @@ public class ConstantsFileReader {
 				//Separate the key from the value
 				tokens = currLine.split(",");
 				
-				constants.put(tokens[0], Double.valueOf(tokens[1]));
+				try{
+					constants.put(tokens[0], Double.valueOf(tokens[1]));
+				}catch(Exception e){
+					constantStr.put(tokens[0], tokens[1]);
+				}
 				
 				currLine = reader.readLine();
 			}
