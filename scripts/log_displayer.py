@@ -41,6 +41,8 @@ graphValuesX = []
 graphValuesY = []
 graph_values = []
 
+mostRecentTimeStamp = "00:00:00";
+
 bufferSize = 25
 
 fig = plt.figure()
@@ -48,42 +50,64 @@ ax1 = fig.add_subplot(1, 1, 1)
 
 conn = httplib.HTTPConnection(IP_ADDRESS, SOCKET_PORT)
 
-def grab_HTTP_message():
-	conn.request("GET", "/")
-	r1 = conn.getresponse()
-	if(r1.status != "404"):
-		return r1.read()
-	return r1.status
+def grab_HTTP_message(timeStamp):
+	try:
+		conn.request("GET", "/" + timeStamp.replace(":","_"), headers={"Connection":" keep-alive"})
+		r1 = conn.getresponse()
+		if(r1.status != "404"):
+			return r1.read()
+		return r1.status
+	except httplib.BadStatusLine:
+		conn.close()
+		print "Failed to connect to server/robot :("
+		return ""
+
 
 def animate(i):
-	global graphValuesX, graphValuesY
+	global graphValuesX, graphValuesY, mostRecentTimeStamp
 
-	message = grab_HTTP_message().split()
-	print message
-	A = message[:3]
-	A.append(' '.join(message[3:]))
-	message = A
+	message = grab_HTTP_message(mostRecentTimeStamp)
 
-	if(len(message) == 0 or message[0] == "404"):
+	if(message == ""):
 		return
 
-	if(not valueInArray(graph_values, message[3])):
+	messages = message.split("\n")
+	outputMessages = []
+
+	if(len(messages) < 1):
 		return
-	else:
-		#Ensure graph values within buffer size
-		while((len(graphValuesX) > int(bufferSize)) and (len(graphValuesY) > int(bufferSize))):
-			graphValuesX.pop(0)
-			graphValuesY.pop(0)
 
-		# print("BufferSize: ", bufferSize, " X: ", len(graphValuesX), " Y: ", len(graphValuesY), " T/F: ", (len(graphValuesX) > bufferSize))
+	for i in range(0, len(messages)):
+		messages[i] = messages[i].split()
+		A = messages[i][:3]
+		A.append(' '.join(messages[i][3:]))
 
+		# Only add real messages, and ones that are going to be graphed
+		if((A[0] == "404") or (A[0] == "null") or (not valueInArray(graph_values, A[3]))):
+			continue
+
+		outputMessages.append(A)
+
+	if(len(outputMessages) < 1):
+		return
+
+	#Ensure graph values within buffer size
+	while((len(graphValuesX) > int(bufferSize)) and (len(graphValuesY) > int(bufferSize))):
+		graphValuesX.pop(0)
+		graphValuesY.pop(0)
+
+	# print("BufferSize: ", bufferSize, " X: ", len(graphValuesX), " Y: ", len(graphValuesY), " T/F: ", (len(graphValuesX) > bufferSize))
+
+	for mess in outputMessages:
 		#Graphing one value vs time
 		if(len(graph_values) == 1):
-			graphValuesX.append(getAdjustedTime(message[1]))
-			graphValuesY.append(getValueFromString(graph_values[0], message[3]))
+			graphValuesX.append(getAdjustedTime(mess[1]))
+			graphValuesY.append(getValueFromString(graph_values[0], mess[3]))
 		else:
-			graphValuesX.append(getValueFromString(graph_values[0], message[3]))
-			graphValuesY.append(getValueFromString(graph_values[1], message[3]))
+			graphValuesX.append(getValueFromString(graph_values[0], mess[3]))
+			graphValuesY.append(getValueFromString(graph_values[1], mess[3]))
+
+	mostRecentTimeStamp = outputMessages[-1][1]
 
 	#Update graph
 	ax1.clear()
@@ -264,7 +288,7 @@ def main():
 			plt.plot(graphValuesX, graphValuesY, "o")
 
 		if("-c" in sys.argv):
-			ani = animation.FuncAnimation(fig, animate, interval=500)
+			ani = animation.FuncAnimation(fig, animate, interval=1000)
 			global bufferSize
 			bufferSize = sys.argv[sys.argv.index("-c") + 1]
 		plt.show()
