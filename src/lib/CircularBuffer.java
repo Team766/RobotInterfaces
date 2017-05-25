@@ -91,14 +91,7 @@ public class CircularBuffer {
 		}
 	}
 	
-	private double timeInSecs(String time){
-		String[] tokens = time.split(":");
-		
-		int[] numbers = new int[tokens.length];
-		
-		for(int i = 0;i < tokens.length;i++)
-			numbers[i] = Integer.parseInt(tokens[i]);
-		
-		return (numbers[0] * 3600.0) + (numbers[1] * 60.0) + numbers[2];
+	private long timeInSecs(String time){
+		return Long.parseLong(time) / 1000l;
 	}
 }

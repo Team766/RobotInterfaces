@@ -28,8 +28,8 @@ public class LogMessage implements Message {
 		return message;
 	}
 	
+	//Unicode time
 	private String getTime(){
-		//Time in GMT so subtract 7 hours to get to Pacific
-		return new Date().toString().substring(12, 20);
+		return "" + System.currentTimeMillis();
 	}
 }

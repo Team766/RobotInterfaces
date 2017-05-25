@@ -87,15 +87,14 @@ public class LogHandler extends Actor {
 		}
 	}
 	
-	private double timeInSecs(String time){
-		String[] tokens = time.split("_");
-		
-		int[] numbers = new int[tokens.length];
-		
-		for(int i = 0; i < tokens.length; i++)
-			numbers[i] = Integer.parseInt(tokens[i]);
-
-		return (numbers[0] * 3600.0) + (numbers[1] * 60.0) + numbers[2];
+	/**
+	 * Takes a time and returns the time in seconds
+	 * 
+	 * @param time - unix time as string
+	 * @return time in seconds
+	 */
+	private long timeInSecs(String time){
+		return Long.parseLong(time) / 1000l;
 	}
 	
 
