@@ -34,7 +34,7 @@ Flags:
 	-g graph one value against time with GRAPH X: val using -g X
 """
 START_TIME = 0;
-IP_ADDRESS = "localhost"#"roborio-766-frc"
+IP_ADDRESS = "roborio-766-frc.local"
 SOCKET_PORT = 5800
 FILE_NAME = "testLog.txt"
 graphValuesX = []
@@ -91,10 +91,14 @@ def animate(i):
 	if(len(outputMessages) < 1):
 		return
 
+	
+	graphValuesX = []
+	graphValuesY = []
+
 	#Ensure graph values within buffer size
-	while((len(graphValuesX) > int(bufferSize)) and (len(graphValuesY) > int(bufferSize))):
-		graphValuesX.pop(0)
-		graphValuesY.pop(0)
+	# while((len(graphValuesX) > int(bufferSize)) and (len(graphValuesY) > int(bufferSize))):
+	# 	graphValuesX.pop(0)
+	# 	graphValuesY.pop(0)
 
 	# print("BufferSize: ", bufferSize, " X: ", len(graphValuesX), " Y: ", len(graphValuesY), " T/F: ", (len(graphValuesX) > bufferSize))
 
@@ -111,6 +115,7 @@ def animate(i):
 
 	#Update graph
 	ax1.clear()
+	# print zip(graphValuesX, graphValuesY)
 	ax1.plot(graphValuesX, graphValuesY)
 	fig.canvas.draw()
 
