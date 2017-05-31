@@ -64,6 +64,10 @@ def grab_HTTP_message(timeStamp):
 		print "Failed to connect to server/robot :("
 		return ""
 
+def timeToString(time):
+	m, s = divmod(time, 60)
+	h, m = divmod(m, 60)
+	return "%d:%02d:%.2f" % (h, m, s)
 
 def animate(i):
 	global graphValuesX, graphValuesY, mostRecentTimeStamp
@@ -100,14 +104,14 @@ def animate(i):
 	#Ensure graph values within buffer size
 	# while((len(graphValuesX) > int(bufferSize)) and (len(graphValuesY) > int(bufferSize))):
 	# 	graphValuesX.pop(0)
-	# 	graphValuesY.pop(0)
+	#	graphValuesY.pop(0)
 
 	# print("BufferSize: ", bufferSize, " X: ", len(graphValuesX), " Y: ", len(graphValuesY), " T/F: ", (len(graphValuesX) > bufferSize))
 
 	for mess in outputMessages:
 		#Graphing one value vs time
 		if(len(graph_values) == 1):
-			graphValuesX.append(mess[1])
+			graphValuesX.append(float(mess[1])/1000.0)
 			graphValuesY.append(getValueFromString(graph_values[0], mess[3]))
 		else:
 			graphValuesX.append(getValueFromString(graph_values[0], mess[3]))
@@ -253,7 +257,8 @@ def main():
 					graphValuesX.append(getValueFromString(graph_values[0], logLines[line][3]))
 					graphValuesY.append(getValueFromString(graph_values[1], logLines[line][3]))
 
-		mylist.insert(END, logLines[line])
+		mylist.insert(END, logLines[line][:1] + [timeToString(logLines[line][1])] + (logLines[line][2:]))
+		# mylist.insert(END, logLines[line])
 
 	   	messageType = logLines[line][0]
 	   	if(messageType == "ERROR"):
