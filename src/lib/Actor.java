@@ -125,7 +125,6 @@ public abstract class Actor implements Runnable{
 			Thread.sleep(sleepTime - (System.currentTimeMillis() - lastSleepTime));
 		} catch (Exception e) {
 			System.out.println(toString() + "\tNo time to sleep, running behind schedule!!");
-			LogFactory.getInstance("General").print(toString() + "\tNo time to sleep, running behind schedule!!");
 			try {
 				Thread.sleep(MIN_SLEEP_TIME);
 			} catch (InterruptedException e1) {}
