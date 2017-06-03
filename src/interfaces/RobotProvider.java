@@ -14,7 +14,7 @@ public abstract class RobotProvider {
 	protected JoystickReader[] joysticks = new JoystickReader[3];
 	protected DigitalInputReader[] digInputs = new DigitalInputReader[8];
 	protected AnalogInputReader[] angInputs = new AnalogInputReader[5];
-	protected DigitalOut[] digOut = new DigitalOut[5];
+	protected RelayOutput[] relays = new RelayOutput[5];
 	
 	//HAL
 	public abstract SpeedController getMotor(int index, boolean isCAN);
@@ -29,7 +29,7 @@ public abstract class RobotProvider {
 	
 	public abstract AnalogInputReader getAnalogInput(int index);
 	
-	public abstract DigitalOut getDigitalOutput(int index);
+	public abstract RelayOutput getRelay(int index);
 	
 	public abstract SolenoidController getSolenoid(int index);
 	
