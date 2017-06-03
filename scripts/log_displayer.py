@@ -7,6 +7,7 @@ from Tkinter import *
 from ftplib import FTP
 from StringIO import StringIO
 import httplib
+import time
 
 # def onObjectClick(event):                  
 #     print('Got object click', event.x, event.y)
@@ -29,11 +30,12 @@ Flags:
 	-l Level
 	-c Continous logging: Buffer size (-1 for display all)
 	-m messages with certain subject
-	-t time interval -t hh:mm:ss-hh:mm:ss
+	-t time interval -t startTimeSec-endTimeSec inclusive
 	-g graph values from messages with GRAPH X: val, Y: val using -g X,Y
 	-g graph one value against time with GRAPH X: val using -g X
 """
-START_TIME = 0;
+
+START_TIME = 0; #ms
 IP_ADDRESS = "roborio-766-frc.local"
 SOCKET_PORT = 5800
 FILE_NAME = "testLog.txt"
@@ -41,7 +43,7 @@ graphValuesX = []
 graphValuesY = []
 graph_values = []
 
-mostRecentTimeStamp = "00:00:00";
+mostRecentTimeStamp = 0;
 
 bufferSize = 25
 
@@ -52,7 +54,7 @@ conn = httplib.HTTPConnection(IP_ADDRESS, SOCKET_PORT)
 
 def grab_HTTP_message(timeStamp):
 	try:
-		conn.request("GET", "/" + timeStamp.replace(":","_"), headers={"Connection":" keep-alive"})
+		conn.request("GET", "/" + str(timeStamp), headers={"Connection":" keep-alive"})
 		r1 = conn.getresponse()
 		if(r1.status != "404"):
 			return r1.read()
@@ -62,6 +64,10 @@ def grab_HTTP_message(timeStamp):
 		print "Failed to connect to server/robot :("
 		return ""
 
+def timeToString(time):
+	m, s = divmod(time, 60)
+	h, m = divmod(m, 60)
+	return "%d:%02d:%.2f" % (h, m, s)
 
 def animate(i):
 	global graphValuesX, graphValuesY, mostRecentTimeStamp
@@ -98,14 +104,14 @@ def animate(i):
 	#Ensure graph values within buffer size
 	# while((len(graphValuesX) > int(bufferSize)) and (len(graphValuesY) > int(bufferSize))):
 	# 	graphValuesX.pop(0)
-	# 	graphValuesY.pop(0)
+	#	graphValuesY.pop(0)
 
 	# print("BufferSize: ", bufferSize, " X: ", len(graphValuesX), " Y: ", len(graphValuesY), " T/F: ", (len(graphValuesX) > bufferSize))
 
 	for mess in outputMessages:
 		#Graphing one value vs time
 		if(len(graph_values) == 1):
-			graphValuesX.append(getAdjustedTime(mess[1]))
+			graphValuesX.append(float(mess[1])/1000.0)
 			graphValuesY.append(getValueFromString(graph_values[0], mess[3]))
 		else:
 			graphValuesX.append(getValueFromString(graph_values[0], mess[3]))
@@ -132,13 +138,8 @@ def allValsInArray(str, array):
 			return False
 	return True
 
-def timeInSecs(time):
-	#6:40:32 -> one value
-	chunks = time.split(":")
-	return (float(chunks[0]) * 3600.0) + (float(chunks[1]) * 60.0) + float(chunks[2])
-
 def getAdjustedTime(time):
-	return (timeInSecs(time) - START_TIME)
+	return (int(time) - START_TIME) / 1000.0
 
 #Adds val to every element in array
 def shiftArrayByOffset(val, array):
@@ -180,17 +181,20 @@ def main():
 	else:
 		inputfile = open(sys.argv[1])
 
+	global START_TIME
 	#Each line in logLines: [LEVEL, TIME, LOCATION, MESSAGE]
 	for line in inputfile:
 		lineSegment = line.split()
 		#Group all the elements in the message section together
 		A = lineSegment[:3]
+
+		if(START_TIME == 0):
+			START_TIME = float(A[1])
+
+		A[1] = getAdjustedTime(A[1])
 		A.append(' '.join(lineSegment[3:]))
 		logLines.append(A)
 		#logLines.append(lineSegment[:3].append(' '.join(lineSegment[3:])))
-
-	global START_TIME
-	START_TIME = float(timeInSecs(logLines[0][1]))
 
 	global graphValuesX, graphValuesY, graph_values
 	graphTimeOffset = 0
@@ -210,8 +214,8 @@ def main():
 			message_strings.append(sys.argv[i+1])
 		if sys.argv[i] == "-t":
 			start_stop = sys.argv[i+1].split("-")
-			timeInterval.append(getAdjustedTime(start_stop[0]))
-			timeInterval.append(getAdjustedTime(start_stop[1]))
+			timeInterval.append(float(start_stop[0]))
+			timeInterval.append(float(start_stop[1]))
 		if sys.argv[i] == "-g":
 			graph_values = (sys.argv[i+1].split(","))
 
@@ -236,7 +240,7 @@ def main():
 			if(not valueInArray(message_strings, logLines[line][3])):
 				continue
 		if(len(timeInterval) > 0):
-			if(getAdjustedTime(logLines[line][1]) < timeInterval[0] or getAdjustedTime(logLines[line][1]) > timeInterval[1]):
+			if(logLines[line][1] <= timeInterval[0] or logLines[line][1] >= timeInterval[1]):
 				continue
 		if(len(graph_values) > 0):
 			if(not valueInArray(graph_values, logLines[line][3])):
@@ -247,13 +251,14 @@ def main():
 
 				#Graphing one value vs time
 				if(len(graph_values) == 1):
-					graphValuesX.append(getAdjustedTime(logLines[line][1]))
+					graphValuesX.append(logLines[line][1])
 					graphValuesY.append(getValueFromString(graph_values[0], logLines[line][3]))
 				else:
 					graphValuesX.append(getValueFromString(graph_values[0], logLines[line][3]))
 					graphValuesY.append(getValueFromString(graph_values[1], logLines[line][3]))
 
-		mylist.insert(END, logLines[line])
+		mylist.insert(END, logLines[line][:1] + [timeToString(logLines[line][1])] + (logLines[line][2:]))
+		# mylist.insert(END, logLines[line])
 
 	   	messageType = logLines[line][0]
 	   	if(messageType == "ERROR"):
