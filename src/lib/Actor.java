@@ -7,9 +7,9 @@ import java.util.concurrent.LinkedBlockingQueue;
 
 public abstract class Actor implements Runnable{
 	
-	private final long RUN_TIME = 10;	//	1 / (Hz) --> to milliseconds
+	private long runTime = 10;	//	1 / (Hz) --> to milliseconds
 	private final long MIN_SLEEP_TIME = 1;
-	
+
 	private final int MAX_MESSAGES = 15;
 	private long lastSleepTime;
 	
@@ -115,7 +115,7 @@ public abstract class Actor implements Runnable{
 	}
 	
 	protected void sleep(){
-		sleep(RUN_TIME);
+		sleep(runTime);
 	}
 	
 	protected void sleep(long sleepTime){
@@ -187,4 +187,9 @@ public abstract class Actor implements Runnable{
 	public boolean isDone(){
 		return done;
 	}
+	
+	public void setSleepTime(long time){
+		runTime = time;
+	}
+	
 }

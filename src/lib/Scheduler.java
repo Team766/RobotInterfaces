@@ -20,6 +20,10 @@ public class Scheduler {
 	}
 	
 	public synchronized void add(Actor act){
+		add(act, 100);
+	}
+	
+	public synchronized void add(Actor act, int rateHz){
 		for(Actor a : actors){
 			if(a.toString().equals(act.toString())){
 				System.err.println("Scheduler: " + act + " already added to schedueler");
@@ -27,6 +31,7 @@ public class Scheduler {
 			}
 		}
 		act.enabled = true;
+		act.setSleepTime((1L/rateHz) * 1000l);
 		actors.add(act);
 		act.init();
 		new Thread(act).start();

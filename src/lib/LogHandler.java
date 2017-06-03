@@ -24,7 +24,6 @@ import com.sun.net.httpserver.HttpServer;
  */
 public class LogHandler extends Actor {
 
-	private final int WAIT_TIME = 50; // 1 / (Hz) --> to milliseconds
 	private final int BUFFER_SIZE = 500; //500
 
 	String fileName, message;
@@ -102,7 +101,7 @@ public class LogHandler extends Actor {
 	public void run() {
 		while (enabled) {
 			iterate();
-			sleep(WAIT_TIME);
+			sleep();
 		}
 	}
 
