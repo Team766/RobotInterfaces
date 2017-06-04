@@ -31,7 +31,7 @@ public class Scheduler {
 			}
 		}
 		act.enabled = true;
-		act.setSleepTime((1L/rateHz) * 1000l);
+		act.setSleepTime((long)((1.0/100) * 1000.0));
 		actors.add(act);
 		act.init();
 		new Thread(act).start();
