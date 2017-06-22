@@ -1,7 +1,6 @@
 package lib;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
+import java.io.*;
 import java.util.HashMap;
 
 /**
@@ -23,62 +22,55 @@ public class ConstantsFileReader {
 	
 	private static ConstantsFileReader instance;
 	
-	public static String fileName = "";
-	public static boolean onRobot = true;
-	
-	private BufferedReader reader;
-	private HashMap<String, Double> constants;
-	private HashMap<String, String> constantStr;
-	
-	public static ConstantsFileReader getInstance(){
-		if(instance == null)
+	public static ConstantsFileReader getInstance() {
+		if (instance == null)
 			instance = new ConstantsFileReader();
 		return instance;
 	}
 	
-	public double get(String key){
-		return constants.containsKey(key) ? constants.get(key) : 0.0;
+	public static final String fileName = "";
+	public static boolean onRobot = true;
+	
+	private HashMap<String, Double> constants = new HashMap<>();
+	private HashMap<String, String> constantStr = new HashMap<>();
+	
+	public double get(String key) {
+		return constants.getOrDefault(key, 0.0);
 	}
 	
-	public String getStr(String key){
-		return constantStr.containsKey(key) ? constantStr.get(key) : "";
+	public String getStr(String key) {
+		return constantStr.getOrDefault(key, "");
 	}
 	
-	public ConstantsFileReader(){
+	private ConstantsFileReader() {
 		onRobot = fileName.equals("constants.csv") || !fileName.equals("simConstants.csv");
 		
 		System.out.println("Loading constants file: " + fileName);
-		constants = new HashMap<String, Double>();
-		constantStr = new HashMap<String, String>();
 		
 		loadConstants();
 	}
 	
 	public void loadConstants(){
-		String currLine = "";
 		try {
-			if(!onRobot)
-				reader = new BufferedReader(new FileReader(this.getClass().getClassLoader().getResource(fileName).getPath()));
-			else
-				reader = new BufferedReader(new FileReader(fileName));
+			Reader source = onRobot? new FileReader(fileName) : new InputStreamReader(getClass().getClassLoader().getResourceAsStream(fileName));
+			BufferedReader reader = new BufferedReader(source);
 			
-			currLine = reader.readLine();
-			String[] tokens;
-			while(currLine != null){
+			String currLine = reader.readLine();
+			while (currLine != null) {
 				//Separate the key from the value
-				tokens = currLine.split(",");
+				String[] tokens = currLine.split(",");
 				
-				try{
+				try {
 					constants.put(tokens[0], Double.valueOf(tokens[1]));
-				}catch(Exception e){
+				} catch(NumberFormatException e) {
 					constantStr.put(tokens[0], tokens[1]);
 				}
 				
 				currLine = reader.readLine();
 			}
 			reader.close();
-
-		} catch (Exception e) {
+			
+		} catch (IOException | NullPointerException e) {
 			System.err.println("Failed to load constants file!\t:(");
 			e.printStackTrace();
 		}

@@ -2,93 +2,94 @@ package lib;
 
 import interfaces.HighPriorityMessage;
 
-import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.concurrent.LinkedBlockingQueue;
 
-public abstract class Actor implements Runnable{
+public abstract class Actor implements Runnable {
 	
 	private long runTime = 10;	//	1 / (Hz) --> to milliseconds
-	private final long MIN_SLEEP_TIME = 1;
-
-	private final int MAX_MESSAGES = 15;
+	private static final long MIN_SLEEP_TIME = 1;
+	
+	private static final int MAX_MESSAGES = 15;
 	private long lastSleepTime;
 	
 	public double itsPerSec = 0;
 	protected boolean done = false;
 	
-	public Class<? extends Message>[] acceptableMessages = (Class<? extends Message>[])new Class[]{};
-	private LinkedBlockingQueue<Message> inbox = new LinkedBlockingQueue<Message>();
+	protected List<Class<? extends Message>> acceptableMessages = new ArrayList<>();
+	private LinkedBlockingQueue<Message> inbox = new LinkedBlockingQueue<>(MAX_MESSAGES);
 	
-	public Class<? extends Actor>[] actorHierarchy = (Class<? extends Actor>[])new Class[]{};
+	public List<Class<? extends Message>> actorHierarchy = new ArrayList<>();
 	
 	public boolean enabled = true;
 	
-	public Actor(){
+	public Actor() {
 		lastSleepTime = System.currentTimeMillis();
 	}
 	
 	public abstract void init();
 	
+	@SafeVarargs
+	protected final void setMessageTypes(Class<? extends Message>... types) {
+		acceptableMessages.clear();
+		Collections.addAll(acceptableMessages, types);
+	}
+	
 	public void filterMessages(){
 	}
 	
-	public int countMessages(Message messages){
-		int sum = 0;
-		for(Message m : inbox.toArray(new Message[0])){
-			if(m.getClass().equals(messages.getClass()))
-				sum++;
+	public int countMessages(Class<? extends Message> type) {
+		int count = 0;
+		for (Message m : inbox) {
+			if (type.isAssignableFrom(m.getClass()))
+				count++;
 		}
-		return sum;
+		return count;
 	}
 	
-	protected boolean newMessage(){
-		return inbox.size() > 0;
+	protected boolean newMessage() {
+		return !inbox.isEmpty();
 	}
 	
-	public void clearInbox(){
+	public void clearInbox() {
 		inbox.clear();
 	}
 	
-	protected boolean keepMessage(Message m){
-	    for(Class<? extends Message> message : acceptableMessages){
-	    	if(m.getClass().equals(message)){
-	            return true;
-	        }
-	    	//LogFactory.getInstance("General").print("Message rejected: " + message.getName());
-	    	//System.out.println(toString() + " Rejected: " + m.toString());
-	    }
-	    return false;
+	private boolean keepMessage(Message m) {
+		return acceptableMessages.contains(m.getClass());
 	}
-
-	public void tryAddingMessage(Message m){
-		if(keepMessage(m)){	    
-	        //Check for room in inbox
-			if(inbox.size() >= MAX_MESSAGES){
+	
+	public void tryAddingMessage(Message m) {
+		if (keepMessage(m)) {
+			// Check for room in inbox
+			if (inbox.size() >= MAX_MESSAGES) {
 				removeMessage();
 			}
 			
-	   	  	try {
-	            inbox.put(m);
+			try {
+				inbox.put(m);
 //	            System.out.println("Adding: " + m.toString());
-	        } catch (InterruptedException e) {
-	            e.printStackTrace();
-	            LogFactory.getInstance("General").print("Failed to add Message:\t" + m);
-	        }
-	    }
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+				LogFactory.getInstance("General").print("Failed to add Message:\t" + m);
+			}
+		}
 	}
 	
-	private void removeMessage(){
-		for(Message mess : inbox){
-			if(!(mess instanceof HighPriorityMessage)){
+	private void removeMessage() {
+		for (Message m : inbox) {
+			if (!(m instanceof HighPriorityMessage)) {
 				//System.out.println("Removing: " + mess.toString());
-				inbox.remove(mess);
+				inbox.remove(m);
 				return;
 			}
 		}
 		LogFactory.getInstance("General").print("Failed to remove a message, all high priority");
 	}
 	
-	public void sendMessage(Message mess){
+	public void sendMessage(Message mess) {
 		try {
 			Scheduler.getInstance().sendMessage(mess);
 		} catch (InterruptedException e) {
@@ -98,63 +99,54 @@ public abstract class Actor implements Runnable{
 		}
 	}
 	
-	public Message readMessage(){
+	protected Message readMessage() {
 		return inbox.poll();
-//		try {
-//			return inbox.take();
-//		} catch (InterruptedException e) {
-//			System.err.println("Failed to readMessage: " + toString());
-//			LogFactory.getInstance("General").print("Failed to readMessage: " + toString());
-//			e.printStackTrace();
-//		}
-//		return null;
 	}
 	
-	public LinkedBlockingQueue<Message> getInbox(){
+	public LinkedBlockingQueue<Message> getInbox() {
 		return inbox;
 	}
 	
-	protected void sleep(){
+	protected void sleep() {
 		sleep(runTime);
 	}
 	
-	protected void sleep(long sleepTime){
+	protected void sleep(long sleepTime) {
 		//Run loops at set speed
 		try {
 			//System.out.println("Curr: " + System.currentTimeMillis() + "\tLast: " + lastSleepTime);
 			Thread.sleep(sleepTime - (System.currentTimeMillis() - lastSleepTime));
-		} catch (Exception e) {
+		} catch (InterruptedException e) {
 			System.out.println(toString() + "\tNo time to sleep, running behind schedule!!");
 			try {
 				Thread.sleep(MIN_SLEEP_TIME);
 			} catch (InterruptedException e1) {}
+			Thread.currentThread().interrupt(); // preserve interrupted status
 		}
 		
 		lastSleepTime = System.currentTimeMillis();
 	}
 	
-	protected void waitForMessage(Message message, Class<? extends StatusUpdateMessage>... messages){
-		if(message == null)
-			return;
+	@SafeVarargs
+	protected final void waitForMessage(Message message, Class<? extends StatusUpdateMessage>... types){
+		if (message == null) return;
 		
 		sendMessage(message);
 		
-		StatusUpdateMessage updateMessage;
-		
-		while(enabled){
-			for(Message mess : inbox){
-				if(mess instanceof StatusUpdateMessage){
-					updateMessage = ((StatusUpdateMessage) mess);
+		while (enabled) {
+			for (Message mess : inbox) {
+				if (mess instanceof StatusUpdateMessage) {
+					StatusUpdateMessage updateMessage = (StatusUpdateMessage) mess;
 					
-					if(updateMessage.getCurrentMessage() != null &&
-						updateMessage.getCurrentMessage().equals(message) && 
-						updateMessage.isDone()){
+					// TODO: check if updateMessage matches types
+					if (message.equals(updateMessage.getCurrentMessage()) &&
+						updateMessage.isDone()) {
 						
 						//Done using it, time to throw it out
 						inbox.remove(mess);
 						return;
 					}
-				}else{
+				} else {
 					//Not an important message, get rid of it
 					inbox.remove(mess);
 				}
@@ -164,17 +156,17 @@ public abstract class Actor implements Runnable{
 		}
 	}
 	
-	protected void log(String message){
+	protected void log(String message) {
 		sendMessage(new LogMessage(getSourceClass() + ": " + message));
 	}
 	
-	private String getSourceClass(){
+	private String getSourceClass() {
 		Object[] out = Thread.currentThread().getStackTrace();
 		return out[out.length - 2].toString();
 	}
 	
-	public boolean equals(Object obj){
-		return this.getClass().getName().equals(obj.getClass().getName());
+	public boolean equals(Object obj) {
+		return obj != null && this.getClass().equals(obj.getClass());
 	}
 	
 	public abstract String toString();
@@ -183,11 +175,11 @@ public abstract class Actor implements Runnable{
 	
 	public abstract void iterate();
 	
-	public boolean isDone(){
+	public boolean isDone() {
 		return done;
 	}
 	
-	public void setSleepTime(long time){
+	public void setSleepTime(long time) {
 		runTime = time;
 	}
 	

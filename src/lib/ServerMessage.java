@@ -1,19 +1,19 @@
 package lib;
 
-public class ServerMessage implements Message{
-	String[] values;
-	String messageName;
+public class ServerMessage implements Message {
+	private String[] values;
+	private String messageName;
 	
-	public ServerMessage(String msg, String[] vals){
+	public ServerMessage(String msg, String[] vals) {
 		messageName = msg;
 		values = vals;
 	}
 	
-	public String getMessageName(){
+	public String getMessageName() {
 		return messageName;
 	}
 	
-	public String[] getValues(){
+	public String[] getValues() {
 		return values;
 	}
 }
