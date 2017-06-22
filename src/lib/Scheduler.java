@@ -1,99 +1,90 @@
 package lib;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class Scheduler {
 	
 	private static Scheduler instance;
 	
-	private ArrayList<Actor> actors;
+	private List<Actor> actors;
 	
-	public static synchronized Scheduler getInstance(){
-		if(instance == null)
+	public static synchronized Scheduler getInstance() {
+		if (instance == null)
 			instance = new Scheduler();
 		
 		return instance;
 	}
 	
-	private Scheduler(){
-		actors = new ArrayList<Actor>();
+	private Scheduler() {
+		actors = new ArrayList<>();
 	}
 	
-	public synchronized void add(Actor act){
-		add(act, 100);
+	public synchronized void add(Actor actor) {
+		add(actor, 100);
 	}
 	
-	public synchronized void add(Actor act, int rateHz){
-		for(Actor a : actors){
-			if(a.toString().equals(act.toString())){
-				System.err.println("Scheduler: " + act + " already added to schedueler");
-				return;
-			}
+	public synchronized void add(Actor actor, int rateHz) {
+		if (actors.contains(actor)) {
+			System.err.println("Scheduler: " + actor + " already added to schedueler");
+			return;
 		}
-		act.enabled = true;
-		act.setSleepTime((long)((1.0/100) * 1000.0));
-		actors.add(act);
-		act.init();
-		new Thread(act).start();
+		actor.enabled = true;
+		actor.setSleepTime((long)((1.0/100) * 1000.0));
+		actors.add(actor);
+		actor.init();
+		new Thread(actor).start();
 	}
 	
-	public synchronized void remove(Actor actor){
+	public synchronized void remove(Actor actor) {
 		actor.enabled = false;
 		
 		//Remove ALL instances of it from list
-		for(int i = actors.size() - 1; i >= 0; i--){
-			if(actors.get(i).toString().equals(actor.toString())){
-				actors.remove(i);
-			}
-		}
+		actors.removeIf(a -> a.equals(actor));
 	}
 	
-	public synchronized void sendMessage(Message newMessage) throws InterruptedException{
+	public synchronized void remove(Class<? extends Actor> type) {
+		actors.removeIf(actor -> {
+			boolean remove = type.isAssignableFrom(actor.getClass());
+			if (remove) actor.enabled = false;
+			return remove;
+		});
+	}
+	
+	public synchronized void sendMessage(Message newMessage) throws InterruptedException {
 		//Add messages to all Actor's queues
-		for(Actor act : actors) {
+		for (Actor act : actors) {
 			act.tryAddingMessage(newMessage);
 		}
 	}
 	
-	public synchronized Actor getActor(Class<? extends Actor> act){
-		for(Actor actor : actors){
-			if(actor.getClass().getName().equals(act.getName()))
+	public synchronized Actor getActor(Class<? extends Actor> type) {
+		for (Actor actor : actors) {
+			if (type.isAssignableFrom(actor.getClass()))
 				return actor;
 		}
 		return null;
 	}
 	
-	public synchronized void remove(Class<? extends Actor> actor) {
-		//Avoid comodifications to the actors arraylist
-		Actor dieingActor = null;
-		
-		for(Actor act : actors){
-			if(act.getClass().isAssignableFrom(actor))
-				dieingActor = act;
-		}
-		if(dieingActor != null)
-			remove(dieingActor);
-	}
-	
 	
 	/**
 	 * Empties entire list of actors
-	 * 
+	 *
 	 * Used so tests get reset between each one.
 	 */
-	public synchronized void reset(){
+	public synchronized void reset() {
 		//Kill all current actors
-		for(Actor clooney : actors){
+		for (Actor clooney : actors) {
 			clooney.enabled = false;
 		}
 		
 		actors.clear();
 		instance = null;
 	}
-
+	
 	public String getCountsPerSecond() {
 		String out = "Actors\t\tIterations\n";
-		for(Actor clooney : actors){
+		for (Actor clooney : actors) {
 			out += clooney.toString() + "\t" + clooney.itsPerSec + "\n";
 			clooney.itsPerSec = 0;
 		}
