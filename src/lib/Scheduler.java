@@ -30,7 +30,7 @@ public class Scheduler {
 			return;
 		}
 		actor.enabled = true;
-		actor.setSleepTime((long)((1.0/100) * 1000.0));
+		actor.setSleepTime((long)((1.0/rateHz) * 1000.0));
 		actors.add(actor);
 		actor.init();
 		new Thread(actor).start();

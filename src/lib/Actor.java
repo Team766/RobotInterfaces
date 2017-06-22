@@ -43,7 +43,7 @@ public abstract class Actor implements Runnable {
 	public int countMessages(Class<? extends Message> type) {
 		int count = 0;
 		for (Message m : inbox) {
-			if (m.getClass().equals(type))
+			if (type.isAssignableFrom(m.getClass()))
 				count++;
 		}
 		return count;
