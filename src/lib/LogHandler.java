@@ -42,7 +42,7 @@ public class LogHandler extends Actor {
 	public void init() {
 		messageBuffer = new CircularBuffer(BUFFER_SIZE);
 
-		acceptableMessages = new Class[] {LogMessage.class};
+		setMessageTypes(LogMessage.class);
 		message = "";
 
 		try {
