@@ -5,6 +5,8 @@ import interfaces.HighPriorityMessage;
 import java.util.Arrays;
 import java.util.concurrent.LinkedBlockingQueue;
 
+import lib.LogMessage.Level;
+
 public abstract class Actor implements Runnable{
 	
 	private long runTime = 10;	//	1 / (Hz) --> to milliseconds
@@ -166,6 +168,10 @@ public abstract class Actor implements Runnable{
 	
 	protected void log(String message){
 		sendMessage(new LogMessage(getSourceClass() + ": " + message));
+	}
+	
+	protected void log(Level lvl, String message){
+		sendMessage(new LogMessage(lvl, getSourceClass() + ": " + message));
 	}
 	
 	private String getSourceClass(){

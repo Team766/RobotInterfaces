@@ -10,83 +10,69 @@ import java.util.Arrays;
 /**
  * Send messages to robot
  */
-public class MessageServer extends Actor {
-	private static final int PORT = 5801;
+public abstract class MessageServer extends Actor {
 
 	private ServerSocket serverSocket;
 	private Socket socket;
 	private BufferedReader in;
 	private String[] message;
 
-	public MessageServer() {
+	public MessageServer(int port) {
 		try {
-			this.serverSocket = new ServerSocket(PORT);
-		} catch (IOException e) {
+			this.serverSocket = new ServerSocket(port);
+		} catch (Exception e) {
 			e.printStackTrace();
 			log("Failed to init server");
 		}
 	}
-
-	public void run() {
+	
+	public void connect(){
 		try {
 			socket = serverSocket.accept();
 		} catch (IOException e1) {
 			System.out.println("Failed to accept socket");
 			log("Failed to accept socket");
+			return;
 		}
+		log("Accepted new connection");
 		
-		System.out.println("Accepted new connection");
 		
 		try {
 			in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-		}catch(Exception e){
-			System.out.println("Error");
-		}
-		
-		while(enabled){
-			iterate();
-			sleep();
+		}catch(IOException e){
+			log("Failed to init bufferdReader for message server");
 		}
 	}
 
-	@Override
-	public void init() {
-	}
-
-	@Override
-	public String toString() {
-		return "Actor: \tMessageServer";
-	}
-
-	@Override
-	public void step() {
-	}
-
-	@Override
-	public void iterate() {
+	public ServerMessage grabData(){
 		String input;
 		try {
 			input = in.readLine();
 		} catch (IOException e1) {
 			e1.printStackTrace();
 			log("Failed to get input");
-			return;
+			return null;
 		}
 		if (input == null) {
-			return;
+			log("Got input, but it was null :(");
+			return null;
 		}
+		
+		//MessageName val1 val2 val3
+		message = input.split(" ");
+		
+		return new ServerMessage(message[0], Arrays.copyOfRange(message, 1, message.length));
+	}
+	
+	public void closeSockets(){
 		try {
-			//MessageName val1 val2 val3
-			message = input.split(" ");
-			
-			Scheduler.getInstance().sendMessage(new ServerMessage(message[0], Arrays.copyOfRange(message, 1, message.length)));
-			
-		} catch (Exception e) {
-			System.out.println("ERROR in Message Server");
-		}finally {
-			try {
-				socket.close();
-			} catch (IOException e) {}
-		}
+			serverSocket.close();
+			socket.close();
+		} catch (IOException e) {}
+	}
+	
+	
+	public String toString() {
+		return "Lib:\tMessageServer";
 	}
 }
