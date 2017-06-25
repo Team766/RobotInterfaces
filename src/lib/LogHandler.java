@@ -106,11 +106,6 @@ public class LogHandler extends Actor {
 	}
 
 	@Override
-	public String toString() {
-		return "Actor: LogHandler";
-	}
-
-	@Override
 	public void iterate() {
 		if (newMessage()) {
 			currentMessage = readMessage();

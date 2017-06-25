@@ -183,7 +183,9 @@ public abstract class Actor implements Runnable{
 		return this.getClass().getName().equals(obj.getClass().getName());
 	}
 	
-	public abstract String toString();
+	public String toString() {
+		return "Actor: "+getClass().getSimpleName();
+	}
 	
 	public abstract void step();
 	

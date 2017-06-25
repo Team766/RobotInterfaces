@@ -71,8 +71,4 @@ public abstract class MessageServer extends Actor {
 		} catch (IOException e) {}
 	}
 	
-	
-	public String toString() {
-		return "Lib:\tMessageServer";
-	}
 }
