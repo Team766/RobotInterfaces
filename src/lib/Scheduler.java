@@ -24,14 +24,12 @@ public class Scheduler {
 	}
 	
 	public synchronized void add(Actor act, int rateHz){
-		for(Actor a : actors){
-			if(a.equals(act)){
-				System.err.println("Scheduler: " + act + " already added to schedueler");
-				return;
-			}
+		if (actors.contains(act)) {
+			System.err.println("Scheduler: " + act + " already added to scheduler");
+			return;
 		}
 		act.enabled = true;
-		act.setSleepTime((long)((1.0/100) * 1000.0));
+		act.setSleepTime(1000 / rateHz);
 		actors.add(act);
 		act.init();
 		new Thread(act).start();
@@ -41,11 +39,7 @@ public class Scheduler {
 		actor.enabled = false;
 		
 		//Remove ALL instances of it from list
-		for(int i = actors.size() - 1; i >= 0; i--){
-			if(actors.get(i).equals(actor)){
-				actors.remove(i);
-			}
-		}
+		actors.removeIf(actor::equals);
 	}
 	
 	public synchronized void sendMessage(Message newMessage) throws InterruptedException{
@@ -63,16 +57,9 @@ public class Scheduler {
 		return null;
 	}
 	
-	public synchronized void remove(Class<? extends Actor> actor) {
-		//Avoid comodifications to the actors arraylist
-		Actor dieingActor = null;
-		
-		for(Actor act : actors){
-			if(act.getClass().isAssignableFrom(actor))
-				dieingActor = act;
-		}
-		if(dieingActor != null)
-			remove(dieingActor);
+	public synchronized void remove(Class<? extends Actor> type) {
+		// remove all matching actors from the list
+		actors.removeIf(actor -> type.isAssignableFrom(actor.getClass()));
 	}
 	
 	
@@ -92,12 +79,12 @@ public class Scheduler {
 	}
 
 	public String getCountsPerSecond() {
-		String out = "Actors\t\tIterations\n";
+		StringBuilder out = new StringBuilder("Actors\t\tIterations\n");
 		for(Actor clooney : actors){
-			out += clooney.toString() + "\t" + clooney.itsPerSec + "\n";
+			out.append(clooney.toString()).append('\t').append(clooney.itsPerSec).append('\n');
 			clooney.itsPerSec = 0;
 		}
-		return out;
+		return out.toString();
 	}
 	
 }
