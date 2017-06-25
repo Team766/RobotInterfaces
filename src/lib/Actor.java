@@ -180,7 +180,7 @@ public abstract class Actor implements Runnable{
 	}
 	
 	public boolean equals(Object obj){
-		return this.getClass().getName().equals(obj.getClass().getName());
+		return this.getClass().equals(obj.getClass());
 	}
 	
 	public String toString() {

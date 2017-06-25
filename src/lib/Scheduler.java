@@ -25,7 +25,7 @@ public class Scheduler {
 	
 	public synchronized void add(Actor act, int rateHz){
 		for(Actor a : actors){
-			if(a.toString().equals(act.toString())){
+			if(a.equals(act)){
 				System.err.println("Scheduler: " + act + " already added to schedueler");
 				return;
 			}
@@ -42,7 +42,7 @@ public class Scheduler {
 		
 		//Remove ALL instances of it from list
 		for(int i = actors.size() - 1; i >= 0; i--){
-			if(actors.get(i).toString().equals(actor.toString())){
+			if(actors.get(i).equals(actor)){
 				actors.remove(i);
 			}
 		}
@@ -55,9 +55,9 @@ public class Scheduler {
 		}
 	}
 	
-	public synchronized Actor getActor(Class<? extends Actor> act){
+	public synchronized Actor getActor(Class<? extends Actor> type){
 		for(Actor actor : actors){
-			if(actor.getClass().getName().equals(act.getName()))
+			if(actor.getClass().equals(type))
 				return actor;
 		}
 		return null;
