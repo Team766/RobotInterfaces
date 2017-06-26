@@ -47,6 +47,34 @@ public class Dashboard extends Actor {
 	 */
 	private Dashboard() {}
 	
+	//// static convenience aliases ////
+	
+	/**
+	 * Alias for {@link #doSendMessage(String, Object...)
+	 * Dashboard.getInstance().doSendMessage(String, Object...)}
+	 */
+	public static boolean sendMessage(String type, Object... args) {
+		return getInstance().doSendMessage(type, args);
+	}
+	
+	/**
+	 * Alias for {@link #doSendMessage(String, List)
+	 * Dashboard.getInstance().doSendMessage(String, List&lt;Object&gt;)}
+	 */
+	public static boolean sendMessage(String type, List<Object> args) {
+		return getInstance().doSendMessage(type, args);
+	}
+	
+	/**
+	 * Alias for {@link #doPlotData(String, double)
+	 * Dashboard.getInstance().doPlotData(String, double)}
+	 */
+	public static boolean plotData(String series, double value) {
+		return getInstance().doPlotData(series, value);
+	}
+	
+	
+	//// the internal workings ////
 	
 	/** the port on which the TCP server listens */
 	private static final int PORT = 5801;
@@ -221,7 +249,7 @@ public class Dashboard extends Actor {
 	/**
 	 * @see #sendMessage(String, List)
 	 */
-	public boolean sendMessage(String type, Object... args) {
+	public boolean doSendMessage(String type, Object... args) {
 		return sendMessage(type, Arrays.asList(args));
 	}
 	
@@ -235,7 +263,7 @@ public class Dashboard extends Actor {
 	 * @return {@code true} if the message was successfully sent; {@code false} if the
 	 *         robot is not connected to the dashboard or if any I/O error occurred
 	 */
-	public boolean sendMessage(String type, List<Object> args) {
+	public boolean doSendMessage(String type, List<Object> args) {
 		StringBuilder msg = new StringBuilder(escapeToken(type) + ':' + args.size() + ':');
 		for (Object arg : args) {
 			msg.append(escapeToken(arg.toString())).append(':');
@@ -253,6 +281,25 @@ public class Dashboard extends Actor {
 			log(Level.ERROR, "Failed to send message to dashboard: " + e);
 		}
 		return false;
+	}
+	
+	/**
+	 * Sends a data point to the dashboard to be plotted on the live
+	 * line chart. If the given series doesn't exist yet (i.e., this
+	 * is the first data point), then a new chart and/or series will
+	 * be created as necessary.
+	 * <p>
+	 * This is a convenience method for calling {@link #sendMessage(String, List)}
+	 * with a type of {@code "DATA"} and arguments {@code series},
+	 * the current time, and {@code value}.
+	 *
+	 * @param series the name of the series to add the data point to (can be anything)
+	 * @param value the value of the data point
+	 * @return {@code true} if the message was successfully sent; {@code false} if the
+	 *         robot is not connected to the dashboard or if any I/O error occurred
+	 */
+	public boolean doPlotData(String series, double value) {
+		return sendMessage("DATA", series, System.currentTimeMillis(), value);
 	}
 	
 	
