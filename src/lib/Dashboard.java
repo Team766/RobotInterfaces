@@ -5,6 +5,7 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -27,6 +28,7 @@ import static lib.LogMessage.Level;
  */
 public class Dashboard extends Actor {
 	
+	/** The single {@code Dashboard} instance. */
 	private static Dashboard _instance;
 	
 	/**
@@ -71,17 +73,29 @@ public class Dashboard extends Actor {
 	public void run() {
 		while (enabled) {
 			// accept a connection if not already connected
-			try {
-				if (socket == null || socket.isClosed()) {
-					socket = serverSocket.accept();
-					out = new OutputStreamWriter(socket.getOutputStream(), StandardCharsets.UTF_8);
-					in = new InputStreamReader(socket.getInputStream(), StandardCharsets.UTF_8);
-					inBuf = new StringBuilder();
+			synchronized (this) {
+				try {
+					if (!isConnected()) {
+						socket = serverSocket.accept();
+						out = new OutputStreamWriter(socket.getOutputStream(), StandardCharsets.UTF_8);
+						in = new InputStreamReader(socket.getInputStream(), StandardCharsets.UTF_8);
+						inBuf = new StringBuilder();
+					}
+				} catch (IOException e) {
+					log(Level.ERROR, "Dashboard server failed to accept a connection: " + e);
+					if (socket != null) {
+						try {
+							socket.close();
+						} catch (IOException e1) {
+							e1.printStackTrace();
+						}
+						socket = null;
+						out = null;
+						in = null;
+					}
+					sleep();
+					continue;
 				}
-			} catch (IOException e) {
-				log(Level.ERROR, "Dashboard server failed to accept a connection: " + e);
-				sleep();
-				continue;
 			}
 			
 			// read a character from the socket
@@ -137,6 +151,34 @@ public class Dashboard extends Actor {
 			msgType = null;
 			msgLen = -1;
 			msgArgs = null;
+		}
+	}
+	
+	//// public interface ////
+	
+	public synchronized boolean isConnected() {
+		return socket != null && !socket.isClosed();
+	}
+	
+	public void sendMessage(String type, Object... args) {
+		sendMessage(type, Arrays.asList(args));
+	}
+	
+	public void sendMessage(String type, List<Object> args) {
+		StringBuilder msg = new StringBuilder(escapeToken(type) + ':' + args.size() + ':');
+		for (Object arg : args) {
+			msg.append(escapeToken(arg.toString())).append(':');
+		}
+		try {
+			synchronized (this) {
+				if (out == null) {
+					log(Level.ERROR, "Failed to send message to dashboard: Not connected");
+				} else {
+					out.write(msg.toString());
+				}
+			}
+		} catch (IOException e) {
+			log(Level.ERROR, "Failed to send message to dashboard: " + e);
 		}
 	}
 	
