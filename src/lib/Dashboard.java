@@ -6,6 +6,8 @@ import java.net.Socket;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import static lib.LogMessage.Level;
 
@@ -86,7 +88,7 @@ public class Dashboard extends Actor {
 			try {
 				int ch = in.read();
 				if (ch == -1 || ch == ':') { // end of a token (EoF or colon)
-					processToken(inBuf.toString());
+					processToken(unescapeToken(inBuf.toString()));
 					inBuf.setLength(0); // clear the buffer
 				} else {
 					inBuf.appendCodePoint(ch);
@@ -95,6 +97,24 @@ public class Dashboard extends Actor {
 				log(Level.ERROR, "Dashboard server failed to read data: " + e);
 			}
 		}
+	}
+	
+	private static final Pattern unescapeRegex = Pattern.compile("%([01])");
+	private static final char[] unescapeMap = {'%', ':'};
+	
+	private static String escapeToken(String token) {
+		return token.replace("%", "%0").replace(":", "%1");
+	}
+	
+	private static String unescapeToken(String token) {
+		Matcher m = unescapeRegex.matcher(token);
+		StringBuffer result = new StringBuffer(token.length());
+		while (m.find()) {
+			m.appendReplacement(result, "");
+			result.append(unescapeMap[m.group(1).charAt(0) - '0']);
+		}
+		m.appendTail(result);
+		return result.toString();
 	}
 	
 	private void processToken(String token) {
