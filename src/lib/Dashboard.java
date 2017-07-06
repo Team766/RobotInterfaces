@@ -169,6 +169,12 @@ public class Dashboard extends Actor {
 				}
 			} catch (IOException e) {
 				log(Level.ERROR, "Dashboard server failed to read data: " + e);
+				try {
+					socket.close();
+					out = null;
+				} catch (IOException e1) {
+					e1.printStackTrace();
+				}
 			}
 		}
 	}
