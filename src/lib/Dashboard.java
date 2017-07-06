@@ -250,7 +250,7 @@ public class Dashboard extends Actor {
 	 * @see #sendMessage(String, List)
 	 */
 	public boolean doSendMessage(String type, Object... args) {
-		return sendMessage(type, Arrays.asList(args));
+		return doSendMessage(type, Arrays.asList(args));
 	}
 	
 	/**
@@ -274,6 +274,7 @@ public class Dashboard extends Actor {
 					log(Level.ERROR, "Failed to send message to dashboard: Not connected");
 				} else {
 					out.write(msg.toString());
+					out.flush();
 					return true;
 				}
 			}
@@ -299,7 +300,7 @@ public class Dashboard extends Actor {
 	 *         robot is not connected to the dashboard or if any I/O error occurred
 	 */
 	public boolean doPlotData(String series, double value) {
-		return sendMessage("DATA", series, System.currentTimeMillis(), value);
+		return doSendMessage("DATA", series, System.currentTimeMillis(), value);
 	}
 	
 	
