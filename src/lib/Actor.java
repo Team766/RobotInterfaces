@@ -19,7 +19,7 @@ public abstract class Actor implements Runnable{
 	protected boolean done = false;
 	
 	public Class<? extends Message>[] acceptableMessages = (Class<? extends Message>[])new Class[]{};
-	private LinkedBlockingQueue<Message> inbox = new LinkedBlockingQueue<Message>();
+	private LinkedBlockingQueue<Message> inbox = new LinkedBlockingQueue<>(MAX_MESSAGES);
 	
 	public Class<? extends Actor>[] actorHierarchy = (Class<? extends Actor>[])new Class[]{};
 	
@@ -63,12 +63,7 @@ public abstract class Actor implements Runnable{
 	}
 
 	public void tryAddingMessage(Message m){
-		if(keepMessage(m)){	    
-	        //Check for room in inbox
-			if(inbox.size() >= MAX_MESSAGES){
-				removeMessage();
-			}
-			
+		if(keepMessage(m)){
 	   	  	try {
 	            inbox.put(m);
 //	            System.out.println("Adding: " + m.toString());
