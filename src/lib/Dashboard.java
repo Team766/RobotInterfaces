@@ -104,6 +104,7 @@ public class Dashboard extends Actor {
 	 */
 	@Override
 	public void init() {
+		log("BAR: Dashboard.init()");
 		try {
 			serverSocket = new ServerSocket(PORT);
 		} catch (IOException e) {
@@ -126,18 +127,20 @@ public class Dashboard extends Actor {
 	 */
 	@Override
 	public void run() {
+		log("BAR: Dashboard.run()");
 		while (enabled) {
+			log("BAR: Dashboard.run() loop");
 			// accept a connection if not already connected
 			synchronized (this) {
 				try {
 					if (!isConnected()) {
-						log(Level.INFO, "Waiting for dashboard TCP connection...");
+						log("FOO: Waiting for dashboard TCP connection...");
 						socket = serverSocket.accept();
-						log(Level.INFO, "Accepted dashboard TCP connection");
+						log("FOO: Accepted dashboard TCP connection");
 						out = new OutputStreamWriter(socket.getOutputStream(), StandardCharsets.UTF_8);
 						in = new InputStreamReader(socket.getInputStream(), StandardCharsets.UTF_8);
 						inBuf = new StringBuilder();
-						log(Level.INFO, "Dashboard TCP connection setup complete");
+						log("FOO: Dashboard TCP connection setup complete");
 					}
 				} catch (IOException e) {
 					log(Level.ERROR, "Dashboard server failed to accept a connection: " + e);
@@ -256,6 +259,8 @@ public class Dashboard extends Actor {
 		return doSendMessage(type, Arrays.asList(args));
 	}
 	
+	private long lastError = Long.MIN_VALUE;
+	
 	/**
 	 * Escapes, formats, and sends a message to the dashboard over TCP.
 	 * This method is threadsafe.
@@ -274,7 +279,11 @@ public class Dashboard extends Actor {
 		try {
 			synchronized (this) {
 				if (out == null) {
-					log(Level.ERROR, "Failed to send message to dashboard: Not connected");
+					long time = System.currentTimeMillis();
+					if (time - lastError > 1000) {
+						log(Level.ERROR, "Failed to send message to dashboard: Not connected");
+						lastError = time;
+					}
 				} else {
 					out.write(msg.toString());
 					out.flush();
