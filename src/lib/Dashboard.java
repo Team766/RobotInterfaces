@@ -131,10 +131,13 @@ public class Dashboard extends Actor {
 			synchronized (this) {
 				try {
 					if (!isConnected()) {
+						log(Level.INFO, "Waiting for dashboard TCP connection...");
 						socket = serverSocket.accept();
+						log(Level.INFO, "Accepted dashboard TCP connection");
 						out = new OutputStreamWriter(socket.getOutputStream(), StandardCharsets.UTF_8);
 						in = new InputStreamReader(socket.getInputStream(), StandardCharsets.UTF_8);
 						inBuf = new StringBuilder();
+						log(Level.INFO, "Dashboard TCP connection setup complete");
 					}
 				} catch (IOException e) {
 					log(Level.ERROR, "Dashboard server failed to accept a connection: " + e);
