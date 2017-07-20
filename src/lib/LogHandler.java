@@ -126,6 +126,7 @@ public class LogHandler extends Actor {
 	private PrintWriter fileWriter;
 
 	private void logError(String message) {
+		Dashboard.sendMessage("LOG", message);
 		fileWriter.println(message);
 		if (fileWriter.checkError()) {
 			System.err.println("Error when writing log file");

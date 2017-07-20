@@ -5,7 +5,7 @@ import java.util.Date;
 public class LogMessage implements Message {
 	
 	public enum Level{
-		INFO, DEBUG, WARNING, ERROR, FATAl
+		INFO, DEBUG, WARNING, ERROR, FATAL
 	};
 	
 	private String message;
