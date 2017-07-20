@@ -127,20 +127,20 @@ public class Dashboard extends Actor {
 	 */
 	@Override
 	public void run() {
-		log("BAR: Dashboard.run()");
+		log(Level.DEBUG, "Dashboard.run()");
 		while (enabled) {
-			log("BAR: Dashboard.run() loop");
+			log(Level.DEBUG, "Dashboard.run() loop");
 			// accept a connection if not already connected
 			synchronized (this) {
 				try {
 					if (!isConnected()) {
-						log("FOO: Waiting for dashboard TCP connection...");
+						log("Waiting for dashboard TCP connection...");
 						socket = serverSocket.accept();
-						log("FOO: Accepted dashboard TCP connection");
+						log("Accepted dashboard TCP connection");
 						out = new OutputStreamWriter(socket.getOutputStream(), StandardCharsets.UTF_8);
 						in = new InputStreamReader(socket.getInputStream(), StandardCharsets.UTF_8);
 						inBuf = new StringBuilder();
-						log("FOO: Dashboard TCP connection setup complete");
+						log(Level.DEBUG, "Dashboard TCP connection setup complete");
 					}
 				} catch (IOException e) {
 					log(Level.ERROR, "Dashboard server failed to accept a connection: " + e);
