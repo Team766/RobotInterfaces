@@ -38,7 +38,9 @@ public class PIDController {
 
 	private double output_value = 0;
 	
-	private double lastTime = System.currentTimeMillis();;
+	private double lastTime = System.currentTimeMillis();
+	
+	public boolean plot = false;
 
 	/**
 	 * 
@@ -126,6 +128,7 @@ public class PIDController {
 	 */
 	public void calculate(double cur_input, boolean clamp) {
 		cur_error = (setpoint - cur_input);
+		if(plot)Dashboard.plotData("cur_error", cur_error);
 		if (isDone()) {
 			output_value = 0;
 			pr("pid done");
@@ -140,6 +143,9 @@ public class PIDController {
 			if ((total_error * Ki) < -1)
 				total_error = -1 / Ki;
 		}
+		
+		if(plot)Dashboard.plotData("P term", Kp * cur_error);
+		if(plot)Dashboard.plotData("D term", Kd * (cur_error - prev_error));
 
 		double out = Kp * cur_error + Ki * total_error + Kd
 				//* ((cur_error - prev_error) / System.currentTimeMillis() - lastTime);
@@ -152,6 +158,8 @@ public class PIDController {
 			output_value = clip(out);
 		else
 			output_value = out;
+		
+		if(plot)Dashboard.plotData("PID output_value", output_value);
 
 		lastTime = System.currentTimeMillis();
 		
