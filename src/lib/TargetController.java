@@ -74,8 +74,8 @@ public class TargetController {
 			return output;
 		} else {
 			// once we're at/past the target, stop and finish
-			double stopDist = -(vel*vel)/(2*acc);
-			if (stopDist > target*0.02 && acc*vel < 0) {
+			double stopTime = -vel/acc;
+			if (stopTime > 0.05) { // make sure we've come to a complete stop
 				return output = reversed? 0.5 : -0.5; // half speed backward
 			} else {
 				done = true;
