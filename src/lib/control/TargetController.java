@@ -1,25 +1,22 @@
-package lib;
+package lib.control;
 
 /**
  * @author Quinn Tucker
  */
-public class TargetController {
+public class TargetController extends Controller {
 	
 	private double k_Speed;
 	private double k_MT;
 	private double k_Friction;
 	
 	private double target;
-	private double startPos, stopPoint;
+	private double stopPoint;
 	
 	private double pos, vel, acc;
 	private double lastUpdateTime;
 	
 	private boolean isFirstUpdate = true;
 	private boolean reversed;
-	private boolean done = false;
-	
-	private double output;
 	
 	public TargetController(double target, double k_Speed, double k_MT, double k_Friction) {
 		this.target = target;
@@ -28,20 +25,20 @@ public class TargetController {
 		this.k_Friction = k_Friction;
 	}
 	
+	@Override
 	public double update(double currentPos) {
 		// on the first call to update(), set up the initial state
 		// (this is dependent on the initial position passed in)
 		if (isFirstUpdate) {
-			startPos = currentPos;
-			reversed = startPos > target;
+			reversed = currentPos > target;
 			if (reversed) {
 				// if the target is in the negative direction, invert
 				// the input & output so that internal inequalities
 				// and such still work as intended
 				target = -target;
-				startPos = -startPos;
+				currentPos = -currentPos;
 			}
-			stopPoint = (target+startPos)/2;
+			stopPoint = (target+currentPos)/2;
 			lastUpdateTime = getTime();
 			
 			isFirstUpdate = false;
@@ -65,7 +62,7 @@ public class TargetController {
 		
 		if (pos < stopPoint) {
 			// before we reach the stop point, go full speed ahead
-			return output = 1.0;
+			return output = reversed? -1.0 : 1.0;
 		} else if (pos < target) {
 			// after the stop point, control the output
 			double dist = target - pos;
@@ -82,19 +79,6 @@ public class TargetController {
 				return output = 0.0;
 			}
 		}
-	}
-	
-	public double getOutput() {
-		return output;
-	}
-	
-	public boolean isDone() {
-		return done;
-	}
-	
-	
-	private static double getTime() {
-		return System.nanoTime() / 1000000000.0;
 	}
 	
 }
