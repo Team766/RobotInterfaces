@@ -3,7 +3,7 @@ package lib;
 import java.util.Arrays;
 
 public class CircularBuffer {
-	private String data[];
+	private final String[] data;
 	private int head, tail, count;
 
 	public CircularBuffer(int size) {
@@ -15,11 +15,12 @@ public class CircularBuffer {
 
 	public synchronized void add(String value) {
 		data[tail] = value;
-		count++;
 		
-		if(head == tail && count > 1)
+		if (head == tail && count > 0)
 			head = (head + 1) % data.length;
-	
+		else
+			count++;
+		
 		tail = (tail + 1) % data.length;
 	}
 
@@ -32,28 +33,26 @@ public class CircularBuffer {
 		return out;
 	}
 	
+	public synchronized int getCount() {
+		return count;
+	}
+	
 	public synchronized String peek(){
 		return data[head];
 	}
 
-	public String toString() {
+	public synchronized String toString() {
 		return Arrays.toString(data);
 	}
 	
-	public String[] orderedArray(){
-		String[] out = new String[data.length];
-		
-		if(tail > head){
-			int x = tail;
-			tail = head;
-			head = x;
-		}
-		
-		for(int i = head; i < out.length; i++){
-			out[i - head] = data[i];
-		}
-		for(int i = 0; i < tail; i++){
-			out[out.length - head + i] = data[i];
+	public synchronized String[] orderedArray(){
+		String[] out = new String[count];
+		if (count == 0) return out;
+		if (tail > head) {
+			System.arraycopy(data, head, out, 0, count);
+		} else {
+			System.arraycopy(data, head, out, 0, out.length - head);
+			System.arraycopy(data, 0, out, out.length - head, tail);
 		}
 		return out;
 	}
@@ -66,21 +65,26 @@ public class CircularBuffer {
 	}
 	
 	public synchronized String stackArrayElements() {
+		if (count == 0) return "";
 		String[] sortedData = orderedArray();
-		String out = "";
-		for(int i = 0; i < sortedData.length - 1; i++) {
-			if(sortedData[i] != null)
-				out += sortedData[i] + "\n";
+		
+		// use a StringBuilder (with an estimated initial capacity to avoid reallocations)
+		// String.join should be equivalent except it uses the default initial capacity of 16
+		// (needs to be profiled)
+		StringBuilder out = new StringBuilder(count * sortedData[0].length() * 2);
+		out.append(sortedData[0]);
+		for (int i = 1; i < sortedData.length; i++) {
+			out.append('\n').append(sortedData[i]);
 		}
-		return out + sortedData[sortedData.length - 1];
+		return out.toString();
 	}
 	
 	public synchronized void removeOldMessages(double timeStampSecs){
 		//Iterate over every message
-		for(int i = 0; i < data.length; i++){
+		for(int i = 0; i < count; i++){
 			if(peek() == null)
-				continue;
-						
+				return;
+			
 			//Remove old messages
 			if(timeInSecs(peek().split(" ")[1]) <= timeStampSecs){
 				remove();
@@ -91,7 +95,7 @@ public class CircularBuffer {
 		}
 	}
 	
-	private long timeInSecs(String time){
-		return Long.parseLong(time) / 1000l;
+	private static double timeInSecs(String time) {
+		return Long.parseLong(time) / 1000.0;
 	}
 }

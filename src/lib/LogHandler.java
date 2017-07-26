@@ -46,6 +46,8 @@ public class LogHandler extends Actor {
 		message = "";
 
 		try {
+			fileWriter = new PrintWriter(new FileWriter(fileName, true));
+			
 			server = HttpServer.create(new InetSocketAddress(5800), 0);
 
 			/*
@@ -106,11 +108,6 @@ public class LogHandler extends Actor {
 	}
 
 	@Override
-	public String toString() {
-		return "Actor: LogHandler";
-	}
-
-	@Override
 	public void iterate() {
 		if (newMessage()) {
 			currentMessage = readMessage();
@@ -125,14 +122,14 @@ public class LogHandler extends Actor {
 			}
 		}
 	}
+	
+	private PrintWriter fileWriter;
 
 	private void logError(String message) {
-		try (PrintWriter writer = new PrintWriter(
-				new FileWriter(fileName, true))) {
-			writer.print(message);
-			writer.println();
-		} catch (IOException e) {
-			e.printStackTrace();
+		Dashboard.sendMessage("LOG", message);
+		fileWriter.println(message);
+		if (fileWriter.checkError()) {
+			System.err.println("Error when writing log file");
 			createFile();
 
 			sleep();

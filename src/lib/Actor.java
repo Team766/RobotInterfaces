@@ -19,7 +19,7 @@ public abstract class Actor implements Runnable{
 	protected boolean done = false;
 	
 	public Class<? extends Message>[] acceptableMessages = (Class<? extends Message>[])new Class[]{};
-	private LinkedBlockingQueue<Message> inbox = new LinkedBlockingQueue<Message>();
+	private LinkedBlockingQueue<Message> inbox = new LinkedBlockingQueue<>(MAX_MESSAGES);
 	
 	public Class<? extends Actor>[] actorHierarchy = (Class<? extends Actor>[])new Class[]{};
 	
@@ -34,10 +34,10 @@ public abstract class Actor implements Runnable{
 	public void filterMessages(){
 	}
 	
-	public int countMessages(Message messages){
+	public int countMessages(Class<? extends Message> type){
 		int sum = 0;
-		for(Message m : inbox.toArray(new Message[0])){
-			if(m.getClass().equals(messages.getClass()))
+		for (Message m : inbox) {
+			if (type.isAssignableFrom(m.getClass()))
 				sum++;
 		}
 		return sum;
@@ -63,12 +63,7 @@ public abstract class Actor implements Runnable{
 	}
 
 	public void tryAddingMessage(Message m){
-		if(keepMessage(m)){	    
-	        //Check for room in inbox
-			if(inbox.size() >= MAX_MESSAGES){
-				removeMessage();
-			}
-			
+		if(keepMessage(m)){
 	   	  	try {
 	            inbox.put(m);
 //	            System.out.println("Adding: " + m.toString());
@@ -135,21 +130,19 @@ public abstract class Actor implements Runnable{
 		lastSleepTime = System.currentTimeMillis();
 	}
 	
-	protected void waitForMessage(Message message, Class<? extends StatusUpdateMessage>... messages){
+	@SafeVarargs
+	protected final void waitForMessage(Message message, Class<? extends StatusUpdateMessage>... messages){
 		if(message == null)
 			return;
 		
 		sendMessage(message);
 		
-		StatusUpdateMessage updateMessage;
-		
 		while(enabled){
 			for(Message mess : inbox){
 				if(mess instanceof StatusUpdateMessage){
-					updateMessage = ((StatusUpdateMessage) mess);
+					StatusUpdateMessage updateMessage = ((StatusUpdateMessage) mess);
 					
-					if(updateMessage.getCurrentMessage() != null &&
-						updateMessage.getCurrentMessage().equals(message) && 
+					if (message.equals(updateMessage.getCurrentMessage()) && 
 						updateMessage.isDone()){
 						
 						//Done using it, time to throw it out
@@ -180,10 +173,12 @@ public abstract class Actor implements Runnable{
 	}
 	
 	public boolean equals(Object obj){
-		return this.getClass().getName().equals(obj.getClass().getName());
+		return obj != null && this.getClass().equals(obj.getClass());
 	}
 	
-	public abstract String toString();
+	public String toString() {
+		return "Actor: "+getClass().getSimpleName();
+	}
 	
 	public abstract void step();
 	
