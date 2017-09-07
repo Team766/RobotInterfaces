@@ -1,4 +1,5 @@
 package interfaces;
+// Team 766 - Robot Interface Base class
 
 public interface MyRobot {
 	public void robotInit();
