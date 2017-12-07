@@ -1,5 +1,7 @@
 package lib.control;
 
+import lib.Dashboard;
+
 /**
  * @author Quinn Tucker
  */
@@ -11,6 +13,8 @@ public class TargetController extends Controller {
 	
 	private double target;
 	private double stopPoint;
+	
+	private double maxAcc = -Double.MAX_VALUE;
 	
 	public TargetController(double target, double k_Speed, double k_MT, double k_Friction) {
 		super(0.001);
@@ -34,8 +38,25 @@ public class TargetController extends Controller {
 		return 0.0;
 	}
 	
+	CalibrationController.Average velAvg = new CalibrationController.Average(15);
+	CalibrationController.Average accAvg = new CalibrationController.Average(15);
+	
 	@Override
 	protected double doUpdate() {
+		Dashboard.plotData("pos-target", pos-target);
+		velAvg.add(vel);
+		final double vel = velAvg.average();
+		Dashboard.plotData("vel", vel);
+//		accAvg.add(acc);
+//		final double acc = accAvg.average();
+		Dashboard.plotData("acc", acc);
+		
+		if (acc > maxAcc) maxAcc = acc;
+		if (Math.abs(target-pos) < (target-stopPoint)*2*0.1 && Math.abs(acc) < maxAcc*0.01) {
+			done = true;
+			return 0.0;
+		}
+		
 		if (pos < stopPoint) {
 			// before we reach the stop point, go full speed ahead
 			return 1.0;

@@ -129,7 +129,7 @@ public class Dashboard extends Actor {
 	public void run() {
 		log(Level.DEBUG, "Dashboard.run()");
 		while (enabled) {
-			log(Level.DEBUG, "Dashboard.run() loop");
+//			log(Level.DEBUG, "Dashboard.run() loop");
 			// accept a connection if not already connected
 			synchronized (this) {
 				try {

@@ -1,7 +1,10 @@
 package lib.control;
 
+import lib.Dashboard;
 import lib.LogMessage;
 import lib.Scheduler;
+
+import java.util.ArrayList;
 
 /**
  * @author Quinn Tucker
@@ -17,7 +20,7 @@ public class CalibrationController extends Controller {
 	public double kSpeed, kMT, kFriction;
 	
 	public CalibrationController() {
-		super(0.001);
+		super(1.0/60);
 	}
 	
 	private void nextStage() {
@@ -27,14 +30,43 @@ public class CalibrationController extends Controller {
 	
 	@Override
 	protected double doFirstUpdate() {
+		log("Calibrating constants...");
 		stageStart = getTime();
 		return super.doFirstUpdate();
 	}
 	
+	static class Average {
+		int num;
+		ArrayList<Double> list = new ArrayList<>();
+		public Average(int num) {this.num = num;}
+		public void add(double x) {
+			list.add(x);
+			if (list.size() > num)
+				list.remove(0);
+		}
+		public double average() {
+			double total = 0.0;
+			for (double x : list) total += x;
+			return total / list.size();
+		}
+	}
+	Average accAvg = new Average(15);
+	Average velAvg = new Average(15);
+	
 	@Override
 	protected double doUpdate() {
 		double stageTime = getTime() - stageStart;
-		boolean upToSpeed = stageTime > 0.5 && acc/vel < 0.002;
+//		log("dt="+dt+", pos="+pos+", vel="+vel+", acc="+acc+",  stageTime="+stageTime);
+		accAvg.add(acc);
+		final double acc = accAvg.average();
+		velAvg.add(vel);
+		final double vel = velAvg.average();
+		log("vel*kSpeed = "+(vel*kSpeed));
+		Dashboard.plotData("pos", pos);
+		Dashboard.plotData("vel", vel);
+		Dashboard.plotData("acc", acc);
+		
+		boolean upToSpeed = stageTime > 0.5 && vel > 0 && acc/vel < 0.09;
 		switch (stage) {
 			case 0:
 				// measure the max speed at 0.5 power
@@ -78,6 +110,7 @@ public class CalibrationController extends Controller {
 					kMT = (va1-va2)/(a1-a2);
 					kFriction = a1 - va1/kMT;
 					log("Measurement 4; kMT = "+kMT+", kFriction = "+kFriction);
+					nextStage();
 					done = true;
 				}
 				return 0.0;
