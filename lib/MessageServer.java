@@ -22,7 +22,7 @@ public abstract class MessageServer extends Actor {
 			this.serverSocket = new ServerSocket(port);
 		} catch (Exception e) {
 			e.printStackTrace();
-			log("Failed to init server");
+			logError("Failed to init server");
 		}
 	}
 	
@@ -31,16 +31,16 @@ public abstract class MessageServer extends Actor {
 			socket = serverSocket.accept();
 		} catch (IOException e1) {
 			System.out.println("Failed to accept socket");
-			log("Failed to accept socket");
+			logError("Failed to accept socket");
 			return;
 		}
-		log("Accepted new connection");
+		logDebug("Accepted new connection");
 		
 		
 		try {
 			in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 		}catch(IOException e){
-			log("Failed to init bufferdReader for message server");
+			logError("Failed to init bufferdReader for message server");
 		}
 	}
 
@@ -50,11 +50,11 @@ public abstract class MessageServer extends Actor {
 			input = in.readLine();
 		} catch (IOException e1) {
 			e1.printStackTrace();
-			log("Failed to get input");
+			logError("Failed to get input");
 			return null;
 		}
 		if (input == null) {
-			log("Got input, but it was null :(");
+			logError("Got input, but it was null :(");
 			return null;
 		}
 		

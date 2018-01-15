@@ -12,6 +12,4 @@ public interface MyRobot {
 	public void autonomousPeriodic();
 	public void teleopPeriodic();
 	public void testPeriodic();
-	
-	public void startCompetition();
 }

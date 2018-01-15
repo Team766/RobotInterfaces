@@ -7,6 +7,7 @@ public abstract class RobotProvider {
 	public static RobotProvider instance;
 	
 	protected SpeedController[] motors = new SpeedController[12];
+	protected CANSpeedController[] canMotors = new CANSpeedController[12];
 	protected EncoderReader[] encoders = new EncoderReader[20];
 	protected SolenoidController[] solenoids = new SolenoidController[10];
 	protected GyroReader[] gyros = new GyroReader[13];
@@ -17,11 +18,8 @@ public abstract class RobotProvider {
 	protected RelayOutput[] relays = new RelayOutput[5];
 	
 	//HAL
-	public abstract SpeedController getMotor(int index, boolean isCAN);
-	
-	public SpeedController getMotor(int index){
-		return getMotor(index, false);
-	}
+	public abstract SpeedController getMotor(int index);
+	public abstract CANSpeedController getCANMotor(int index);
 	
 	public abstract EncoderReader getEncoder(int index1, int index2);
 	

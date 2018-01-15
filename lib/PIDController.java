@@ -38,7 +38,7 @@ public class PIDController {
 
 	private double output_value = 0;
 	
-	private double lastTime = System.currentTimeMillis();;
+	private double lastTimeMillis = System.currentTimeMillis();
 
 	/**
 	 * 
@@ -132,7 +132,9 @@ public class PIDController {
 			return;
 		}
 
-		total_error += cur_error;
+		double delta_time = (System.currentTimeMillis() - lastTimeMillis) * 0.001;
+
+		total_error += cur_error * delta_time;
 
 		if ((total_error * Ki) > 1) {
 			total_error = 1 / Ki;
@@ -141,9 +143,10 @@ public class PIDController {
 				total_error = -1 / Ki;
 		}
 
-		double out = Kp * cur_error + Ki * total_error + Kd
-				//* ((cur_error - prev_error) / System.currentTimeMillis() - lastTime);
-				* (cur_error - prev_error);
+		double out =
+				Kp * cur_error +
+				Ki * total_error +
+				Kd * ((cur_error - prev_error) / delta_time);
 		prev_error = cur_error;
 
 		pr("Pre-clip output: " + out);
@@ -153,7 +156,7 @@ public class PIDController {
 		else
 			output_value = out;
 
-		lastTime = System.currentTimeMillis();
+		lastTimeMillis = System.currentTimeMillis();
 		
 		pr("	Total Eror: " + total_error + "		Current Error: " + cur_error
 				+ "	Output: " + output_value + " 	Setpoint: " + setpoint);

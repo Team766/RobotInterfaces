@@ -1,8 +1,9 @@
 package lib;
 
 import java.util.Arrays;
+import java.util.Iterator;
 
-public class CircularBuffer {
+public class CircularBuffer implements Iterable<String> {
 	private String data[];
 	private int head, tail, count;
 
@@ -93,5 +94,26 @@ public class CircularBuffer {
 	
 	private long timeInSecs(String time){
 		return Long.parseLong(time) / 1000l;
+	}
+
+	@Override
+	public Iterator<String> iterator() {
+		return new Iterator<String>() {
+			int position = head;
+			boolean done = count > 0;
+
+			@Override
+			public boolean hasNext() {
+				return !done;
+			}
+
+			@Override
+			public String next() {
+				if (position == tail) {
+					done = true;
+				}
+				return data[position++];
+			}
+		};
 	}
 }

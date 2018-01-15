@@ -5,28 +5,38 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
-public class Logger {
+public class Logger extends Actor {
+
+	public enum Level{
+		DEBUG, INFO, WARNING, ERROR, FATAL
+	};
 
 	private PrintWriter pw;
 	private long startTime = 0;
 	private boolean INDENT = false;
 	private String name;
 	
-	private HashMap<String, Integer> iterations = new HashMap<String, Integer>();
-	
 	private boolean htmlOnly;
 	
 	private String LogFolder = getLogFolderName();
 
-	private String html = "<head><meta http-equiv=\"refresh\" content=\"1\"></head><body style=\"background-color:rgba(180, 28, 28, 0.8)\">";
+	private String headerHtml = "<head><meta http-equiv=\"refresh\" content=\"1\"></head><body style=\"background-color:rgba(180, 28, 28, 0.8)\">";
+	private static final int HTML_HISTORY_LENGTH = 200;
+	private CircularBuffer htmlList = new CircularBuffer(HTML_HISTORY_LENGTH);
+	private ArrayList<String> diskList = new ArrayList<String>();
+
+	private static ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
 	
 	public Logger(String fileName) {
 		name = fileName;
 		
-		html += "<h2 style = \"color: white\">" + name + "</h2>  <p style = \"color: #fc4\">";
+		headerHtml += "<h2 style = \"color: white\">" + name + "</h2>  <p style = \"color: #fc4\">";
 		htmlOnly = false;
 		
 		try {
@@ -38,86 +48,35 @@ public class Logger {
 			System.out.println("Something went wrong in the log's constructor");
 		}
 		startTime = System.currentTimeMillis() / 1000l;
-
 	}
 
-	public void print(String message) {
-//		if(htmlOnly){
-//			if(INDENT)
-//				html += getHtmlTime() + "\t\t" + message + "<br>";
-//			else
-//				html += getHtmlTime() + "\t\t" + message + "<br>";
-//		}else{
-//			try {
-//				if (INDENT) {
-//					html += getHtmlTime() + "\t\t" + message + "<br>";
-//					pw.println(getTime() + "\t\t" + message);
-//				} else {
-//					html += getHtmlTime() + "\t\t" + message + "<br>";
-//					pw.println(getTime() + "\t" + message);
-//				}
-//			} catch (NullPointerException e) {
-//				System.out.println("Null Pointer alert!");
-//			}
-//		}
+	public synchronized void log(Level level, String message) {
+		String spacing = INDENT ? "\t\t" : "\t";
+		htmlList.add(getHtmlTime() + spacing + message + "<br>");
+		if(!htmlOnly){
+			diskList.add(getTime() + spacing + message);
+			if(level.compareTo(Level.ERROR) >= 0){
+				flushDisk();
+			}
+		}
 	}
 	
-	public void printPeriodic(String message, String key, int iters){
-//		if(!iterations.containsKey(key)){
-//			iterations.put(key, 0);
-//			return;
-//		}
-//		
-//		if(iterations.get(key) > iters){
-//			print("-P " + message);
-//			iterations.put(key, 0);
-//		}else{
-//			iterations.put(key, iterations.get(key) + 1);
-//		}
+	public synchronized void flushDisk() {
+		if (pw == null) {
+			return;
+		}
+		for (String message : diskList) {
+			pw.println(message);
+		}
+		diskList.clear();
 	}
 
-	public void printRaw(String in) {
-//		if(htmlOnly)
-//			html += in + "<br>";
-//		else{
-//			try {
-//				html += in + "<br>";
-//				pw.println(in);
-//			} catch (NullPointerException e) {
-//				System.out.println("Can't print raw value: " + in);
-//			}
-//		}
-	}
-
-	public void print(String message, int value) {
-//		if(htmlOnly){
-//			if(INDENT)
-//				html += getHtmlTime() + "\t\t" + message + value + "<br>";
-//			else
-//				html += getHtmlTime() + "\t" + message + value + "<br>";
-//		}else{
-//			try {
-//				if (INDENT) {
-//					html += getHtmlTime() + "\t\t" + message + value + "<br>";
-//					pw.println(getTime() + "\t\t" + message + value);
-//				}
-//	
-//				else {
-//					html += getHtmlTime() + "\t" + message + value + "<br>";
-//					pw.println(getTime() + "\t" + message + value);
-//				}
-//			} catch (NullPointerException e) {
-//				System.out.println("Can't save log!");
-//			}
-//		}
-	}
-
-	public void closeFile() {
-//		try {
-//			pw.close();
-//		} catch (NullPointerException e) {
-//			System.out.println("Can't save log!");
-//		}
+	public synchronized void closeFile() {
+		if (pw == null) {
+			return;
+		}
+		flushDisk();
+		pw.close();
 	}
 
 	private String getTime() {
@@ -136,27 +95,39 @@ public class Logger {
 		return INDENT;
 	}
 
-	public void setIndent(boolean iNDENT) {
-		INDENT = iNDENT;
+	public void setIndent(boolean indent) {
+		INDENT = indent;
 	}
 
 	public String getName() {
 		return name;
 	}
 
-	public String getHTML() {
-		return html;
+	public synchronized String getHTML() {
+		return headerHtml + String.join("", htmlList);
 	}
 	
-	public void clearHTML(){
-		html = "<head><meta http-equiv=\"refresh\" content=\"1\"></head><body style=\"background-color:rgba(180, 28, 28, 0.8)\">";
-		html += "<h2 style = \"color: white\">" + name + "</h2>  <p style = \"color: #fc4\">";
-		print("Sucessfully cleared HTML log");
+	public synchronized void clearHTML(){
+		log(Level.INFO, "Sucessfully cleared HTML log");
 	}
 	
-	@SuppressWarnings("deprecation")
 	private String getLogFolderName(){
-		Date date = new Date(System.currentTimeMillis());
-		return new SimpleDateFormat("dd-MM-yyyy").format(date) + "_" + date.getHours() + "~" + date.getMinutes() + "~" + date.getSeconds();
+		return new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss").format(new Date());
+	}
+
+	@Override
+	public String toString() {
+		return "Logger-" + name;
+	}
+
+	@Override
+	public void iterate() {
+		if (!htmlOnly) {
+			try {
+				scheduler.schedule(this::flushDisk, 0, TimeUnit.SECONDS);
+			} catch (Exception ex) {
+				log(Level.ERROR, "Could not schedule disk writing task: " + ex);
+			}
+		}
 	}
 }
