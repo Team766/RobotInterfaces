@@ -6,16 +6,12 @@ public class LogFactory {
 	private static HashMap<String, Logger> logs = new HashMap<String, Logger>();
 	
 	public synchronized static Logger getInstance(String key){
-		return logs.get(key);
-	}
-	
-	/**
-	 * Only call in CommandBase init()
-	 * @param key The name of the new log
-	 */
-	public synchronized static void createInstance(String key){
-		Logger adding = new Logger(key);
-		logs.put(key, adding);
+		Logger instance = logs.get(key);
+		if(instance == null){
+			instance = new Logger(key);
+			logs.put(key, instance);
+		}
+		return instance;
 	}
 	
 	public static void closeFile(String key){

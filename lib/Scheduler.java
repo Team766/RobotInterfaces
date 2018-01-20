@@ -20,6 +20,9 @@ public class Scheduler {
 	}
 	
 	public synchronized void add(Actor act){
+		if(act == null){
+			throw new RuntimeException("Actor is null!");
+		}
 		for(Actor a : actors){
 			if(a.toString().equals(act.toString())){
 				System.err.println("Scheduler: " + act + " already added to schedueler");
