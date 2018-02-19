@@ -7,7 +7,7 @@ public abstract class RobotProvider {
 	public static RobotProvider instance;
 	
 	protected SpeedController[] motors = new SpeedController[12];
-	protected CANSpeedController[] canMotors = new CANSpeedController[12];
+	protected CANSpeedController[] canMotors = new CANSpeedController[64];
 	protected EncoderReader[] encoders = new EncoderReader[20];
 	protected SolenoidController[] solenoids = new SolenoidController[10];
 	protected GyroReader[] gyros = new GyroReader[13];
