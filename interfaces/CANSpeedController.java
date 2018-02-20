@@ -65,4 +65,11 @@ public interface CANSpeedController extends SpeedController {
 	 * to re-enable the motor.
 	 */
 	void stopMotor();
+	
+	/**
+	 * Sets the motors encoder value to the given position.
+	 * 
+	 * @param position The desired set position
+	 */
+	void setPosition(int position);
 }
