@@ -18,4 +18,18 @@ public interface JoystickReader {
 	   * @return The state of the button.
 	   */
 	  public boolean getRawButton(final int button);
+	  
+	  /**
+	   * Get the value of the POV
+	   * 
+	   * @return the value of the POV
+	   */
+	  public int getPOV();
+	  
+	  /**
+	   * Get the state of the trigger
+	   * 
+	   * @return the state of the joystick trigger
+	   */
+	  public boolean getTrigger();
 }

@@ -14,7 +14,6 @@ public interface CANSpeedController extends SpeedController {
 		Follower,
 		MotionProfile,
 		MotionMagic,
-		MotionMagicArc,
 		MotionProfileArc,
 		Disabled,
 	}
