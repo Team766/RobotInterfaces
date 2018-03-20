@@ -32,4 +32,11 @@ public interface JoystickReader {
 	   * @return the state of the joystick trigger
 	   */
 	  public boolean getTrigger();
+	  
+	  /**
+	   * Finds whether the trigger was pressed since the last check
+	   * 
+	   * @return whether the trigger was pressed since the last check
+	   */
+	  public boolean getTriggerPressed();
 }
