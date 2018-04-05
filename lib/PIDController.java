@@ -26,8 +26,8 @@ public class PIDController {
 	private double Kp = 0;
 	private double Ki = 0;
 	private double Kd = 0;
-	private double maxoutput_low = 0;
-	private double maxoutput_high = 0;
+	private double maxoutput_low = -1.0;
+	private double maxoutput_high = 1.0;
 	private double endthreshold = 0;
 
 	private double setpoint = 0;
@@ -126,12 +126,14 @@ public class PIDController {
 	 */
 	public void calculate(double cur_input, boolean clamp) {
 		cur_error = (setpoint - cur_input);
+		/*
 		if (isDone()) {
 			output_value = 0;
 			pr("pid done");
 			return;
 		}
-
+		*/
+		
 		double delta_time = (System.currentTimeMillis() - lastTimeMillis) * 0.001;
 
 		total_error += cur_error * delta_time;
